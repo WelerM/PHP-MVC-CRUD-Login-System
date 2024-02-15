@@ -1,35 +1,44 @@
-<div class="bg-dark vh-100 " style="margin-top:100px">
+<div class=" vh-100 " style="margin-top:100px">
 
-    <div class="welcome-container bg-dark w-100">
+    <div class="welcome-container  w-100">
 
-        <form class=" p-4 text-light position-absolute " style="width:400px;top:50%;left:50%;transform: translate(-50%, -50%)" action="?a=signin" method="POST">
+        <form class=" p-4  position-absolute " style="width:400px;top:50%;left:50%;transform: translate(-50%, -50%)" action="?a=signin" method="POST">
 
-        <?php
-            if (isset($_SESSION['error'])) {
-                echo $_SESSION['error'];
+            <?php if (isset($_SESSION['error'])) :  ?>
 
-                unset($_SESSION['error']);
-            }
-        
-        ?>
+                <div class='alert alert-danger text-center'>
+                    <?= $_SESSION['error'] ?>
+                    <?php unset($_SESSION['error']) ?>
+                </div>
 
-            <p class="text-center fs-2 mb-4">Login</p>
+            <?php endif; ?>
+
+            <?php if (isset($_SESSION['success'])) :  ?>
+
+                <div class='alert alert-success text-center'>
+                    <?= $_SESSION['success'] ?>
+                    <?php unset($_SESSION['success']) ?>
+                </div>
+
+            <?php endif; ?>
+
+
+
+            <p class="text-center text-success  fs-2 mb-4">Login</p>
 
             <div class="mb-3">
                 <label for="login-email" class="form-label">Email address</label>
 
-                <input type="email" name="login-email"  class="form-control bg-dark text-light" id="login-email" 
-                value="email@test.com"
-                aria-describedby="emailHelp">
+                <input type="email"  name="login-email" class="form-control" id="login-email"  aria-describedby="emailHelp">
 
-                
+
             </div>
 
             <div class="mb-3">
 
                 <label for="login-password" class="form-label">Password</label>
 
-                <input type="password" name="login-password" class="form-control  bg-transparent text-light" id="login-password">
+                <input type="password" name="login-password" class="form-control  bg-transparent " id="login-password">
 
             </div>
 

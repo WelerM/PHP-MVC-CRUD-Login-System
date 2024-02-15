@@ -2,11 +2,12 @@ const layout = new Layout();
 
 const [...listItems] = document.querySelectorAll('li');
 const [...input_check_seasons] = document.querySelectorAll('.form-check-input')
-const img_container = document.querySelector('.options-container > div')
+const img_container = document.querySelector('#test-animal')
+
 const alert_element = document.querySelector('.alert-danger')
 const alert_text = document.querySelector('.alert-danger-text')
 
-const form = document.querySelector('#img-form')
+const form_1 = document.querySelector('#img-form')
 const container_img_preview = document.querySelector('#img-preview')
 
 const form_input_type = document.querySelector('#form-input-type')
@@ -96,8 +97,8 @@ listItems.map(li => {
 
         //Sets choosen body part option to checked
         let li_top = document.querySelector('#' + e.target.textContent)
-        
-        li_top.style.background = 'rgb(58, 58, 58)'
+
+        li_top.style.background = 'rgb(201, 201, 201)'
         li_top.style.color = 'white'
 
 
@@ -115,8 +116,6 @@ if (document.querySelector('.btn-add')) {
         is_btn_edit_clicked = false;
 
         layout.btn_add_clicked()
-
-
 
         ///Checks which body part will be handled in PHP
         if (selected_img_to_use === 'top') {
@@ -299,7 +298,7 @@ if (document.querySelector('#btn-use')) {
             fetch_images(selected_img_to_use)
         }, 100);
 
-    
+
         //Closes img info form
         document.querySelector('#btn-close-form').click();
     })
@@ -343,6 +342,14 @@ if (document.querySelector('#btn-edit')) {
 
         layout.btn_edit_clicked();
 
+        //Fill input fields with current img's information
+        //Displays saved images
+        axios.defaults.withCredentials = true;
+        axios.get('?a=retrieve_image_info&data=' + img_id)
+            .then(function (response) { })
+
+
+
 
         // add id da imagem no "input file" do formulario
         let hidden_input_img_id = document.querySelector('#input-img-id')
@@ -354,7 +361,7 @@ if (document.querySelector('#btn-edit')) {
 
 
         //Change form's "action" attribute to a php to edit data
-        form.setAttribute('action', '?a=edit_image')
+        form_1.setAttribute('action', '?a=edit_image')
     })
 }
 
@@ -456,7 +463,24 @@ if (document.querySelector("#form-input")) {
 
 
 
+async function is_user_logged() {
 
+    axios.defaults.withCredentials = true;
+    axios.get('?a=is_user_logged')
+        .then(function (response) {
+
+            if (response.data === true) {
+
+                return true
+
+            } else {
+                return false
+            }
+
+        })
+
+
+}
 
 
 
@@ -464,7 +488,6 @@ function start() {
 
     //Checks in the URL to check if it has a "data" varible
     let queryParams = new URLSearchParams(window.location.search);
-
     if (queryParams.has('data')) {
         let dataValue = queryParams.get('data');
 
@@ -472,20 +495,27 @@ function start() {
         selected_img_to_use = dataValue
         fetch_images(selected_img_to_use)
 
+
         //Marks choosen ul for user accessibility
         let custom_checked_li = document.querySelector('#' + dataValue)
-        custom_checked_li.style.background = " rgb(58, 58, 58)"
+        custom_checked_li.style.background = 'rgb(201, 201, 201)'
 
     } else {
-        //Starts the app with the "top" body part
-        selected_img_to_use = 'top'
-        fetch_images(selected_img_to_use)
+
+
+        if (is_user_logged()) {
+
+            //Starts the app with the "top" body part
+            selected_img_to_use = 'top'
+            fetch_images(selected_img_to_use)
+
+        }
 
         //Marks choosen ul for user accessibility
         let custom_checked_li = document.querySelector('#top')
         if (custom_checked_li) {
 
-            custom_checked_li.style.background = " rgb(58, 58, 58)"
+            custom_checked_li.style.background = 'rgb(201, 201, 201)'
         }
 
     }
@@ -529,10 +559,10 @@ function validate_form_input_checks() {
     }
 
 
-        document.querySelector('#btn-form-submit').click();
+    document.querySelector('#btn-form-submit').click();
 
-        return true;
-    
+    return true;
+
 }
 
 
@@ -577,39 +607,48 @@ function update_displayed_images() {//Being callend on START() and USE_IMG();
 
 
         //Gets all images that are set as "Displayed" on database
-        axios.defaults.withCredentials = true;
-        axios.get('?a=show_wearing_parts')
-            .then(function (response) {
-
-                let data = response.data
-
-                if (data) {
-
-                    data.map(i => {
-
-                        if (i.img_type === 'top') {
-                            top_displayed_img.setAttribute('src', i.img_src)
-                        }
-
-                        if (i.img_type === 'torso') {
-                            torso_displayed_img.setAttribute('src', i.img_src)
-                        }
-
-                        if (i.img_type === 'legs') {
-                            legs_displayed_img.setAttribute('src', i.img_src)
-                        }
-
-                        if (i.img_type === 'feet') {
+        if (is_user_logged()) {
 
 
-                            feet_displayed_img.setAttribute('src', i.img_src)
+            axios.defaults.withCredentials = true;
+            axios.get('?a=show_wearing_parts')
+                .then(function (response) {
 
-                        }
+                    let data = response.data
 
-                    })
+                    if (data) {
 
-                }
-            })
+                        data.map(i => {
+
+                            if (i.img_type === 'top') {
+                                top_displayed_img.setAttribute('src', i.img_src)
+                            }
+
+                            if (i.img_type === 'torso') {
+                                torso_displayed_img.setAttribute('src', i.img_src)
+                            }
+
+                            if (i.img_type === 'legs') {
+                                legs_displayed_img.setAttribute('src', i.img_src)
+                            }
+
+                            if (i.img_type === 'feet') {
+
+
+                                feet_displayed_img.setAttribute('src', i.img_src)
+
+                            }
+
+                        })
+
+                    }
+                })
+
+
+
+        }
+
+
 
     }
 }
@@ -617,7 +656,6 @@ function update_displayed_images() {//Being callend on START() and USE_IMG();
 function fetch_images(param) {
 
     selected_img_to_use = param
-
 
     //Displays saved images
     axios.defaults.withCredentials = true;
@@ -632,25 +670,23 @@ function fetch_images(param) {
                 while (img_container.firstChild) {
                     img_container.removeChild(img_container.firstChild);
                 }
+
             }
+
 
             if (data.length === 0) {//No results on database
 
-                //Displays "No data yet" text inside container
-                let warning_text = document.createElement('h1')
-                warning_text.textContent = "No images yet"
-                warning_text.setAttribute('name', 'warning-text')
-                img_container.appendChild(warning_text)
+                //  layout.show_error_alert("addnewimages")
 
             } else {
 
-                //Creates list of saved images on container
 
+                //Creates list of saved images on container
                 data.map(i => {
-           
+
                     let img_element = document.createElement('img')
 
-                    img_element.classList.add('img')
+                    img_element.classList.add('img', 'shadow', 'border')
                     if (img_container) {
 
                         img_container.appendChild(img_element)
@@ -703,6 +739,9 @@ function fetch_images(param) {
                     })
                 })
             }
+
+
+
         })
 }
 
@@ -712,7 +751,7 @@ function delete_image() {
     axios.defaults.withCredentials = true;
     axios.get('?a=delete_image&id=' + img_id + '&name=' + selected_img_to_use)
         .then(function (response) {
-        console.log(response.data);
+
             //Updates images currently displayed on the "wearing container"
             update_displayed_images()
         })
@@ -740,7 +779,7 @@ function show_image_info(img_id, body_part) {
         .then(function (response) {
 
             let data = response.data;
-            
+
             layout.show_img_info(data.img_src)
 
 
@@ -758,24 +797,34 @@ function show_image_info(img_id, body_part) {
             //Adds image  title
             let img_info_title = document.querySelector('#img-info-title')
             img_info_title.textContent = data[0].img_name
+            //==================================================================
 
 
+
+            //Sets available seasons for this image
             let arr_img_info = []
 
             for (let key in data[0]) {
                 arr_img_info.push(data[0][key])
+
             }
 
 
             //Adds seasons
             let imgs_season_arr = []
 
-            if (arr_img_info[7] != null) {
-                imgs_season_arr.push(arr_img_info[7])
+            if (arr_img_info[8] != null) {
+                imgs_season_arr.push('spring')
 
             }
-            if (arr_img_info[8] != null) {
-                imgs_season_arr.push(arr_img_info[8])
+            if (arr_img_info[9] != null) {
+                imgs_season_arr.push('summer')
+            }
+            if (arr_img_info[10] != null) {
+                imgs_season_arr.push('fall')
+            }
+            if (arr_img_info[11] != null) {
+                imgs_season_arr.push('winter')
             }
 
 
@@ -785,12 +834,13 @@ function show_image_info(img_id, body_part) {
 
 
 
-            let img_info_list_season = document.querySelector('#img-info-list-season')
-
             //Clears off old LI results
+            let img_info_list_season = document.querySelector('#img-info-list-season')
             while (img_info_list_season.firstChild) {
                 img_info_list_season.removeChild(img_info_list_season.firstChild);
             }
+
+
 
             //Displays available seasons for this image
             imgs_season_arr.map(season => {
@@ -856,10 +906,10 @@ function show_image_info(img_id, body_part) {
             let imgs_temperature_arr = []
 
             if (arr_img_info[5] != null) {
-                imgs_temperature_arr.push(arr_img_info[5])
+                imgs_temperature_arr.push(arr_img_info[6])
             }
             if (arr_img_info[6] != null) {
-                imgs_temperature_arr.push(arr_img_info[6])
+                imgs_temperature_arr.push(arr_img_info[7])
             }
             let img_info_list_temp = document.querySelector('#img-info-list-temp')
 
@@ -889,20 +939,18 @@ function show_image_info(img_id, body_part) {
 
             //Opens the actual modal by its btn
             document.querySelector('#btn-launch-modal').click();
-            
+
         })
 
 }
 
 
-function getWeather() {
+async function getWeather() {
 
-    var city = 'Porto Alegre';
-    var country = 'BR';
 
     //Displays saved images
     axios.defaults.withCredentials = true;
-    axios.get(`?a=weather_api&city=${city}&country=${country}`)
+    axios.get(`?a=weather_api`)
         .then(function (response) {
 
             let data = response.data
@@ -919,14 +967,103 @@ function getWeather() {
 
             console.log(error);
             //Launches error alert
-/*             Swal.fire({
-                title: 'No internet connection at the moment',
-                text: 'Make sure you have access to the internet',
-                icon: 'warning',
-            }) */
+            /*             Swal.fire({
+                            title: 'No internet connection at the moment',
+                            text: 'Make sure you have access to the internet',
+                            icon: 'warning',
+                        }) */
 
             current_temperature = null
         });
 }
 getWeather();
+
+
+
+//Sign up form
+//Esperando api
+const selectCountry = document.querySelector('.select-country')
+selectCountry.addEventListener('change', () => { selectState.removeAttribute('disabled') });
+if (selectCountry) {
+
+    async function load_country_options() {
+        axios.defaults.withCredentials = true;
+        axios.get(`?a=get_country_list`)
+            .then(function (response) {
+
+                let data = response.data
+
+                data.forEach(country => {
+                    const option = document.createElement('option')
+                    option.classList.add('option-country')
+                    option.value = country.iso2
+                    option.textContent = country.name
+                    selectCountry.appendChild(option)
+                })
+
+
+                //Removes "disabled" attribuete from the select tag below (select city)
+
+
+            })
+    }
+    window.onload = load_country_options
+}
+
+
+const selectState = document.querySelector('.select-state')
+selectState.addEventListener('change', () => { selectCity.removeAttribute('disabled') });
+async function load_states_options() {
+
+    let selected_country = selectCountry.value
+
+    selectState.innerHTML = '<option value="">Select State</option>'
+
+    axios.defaults.withCredentials = true;
+    axios.get(`?a=get_country_list&selected-country=${selected_country}`)
+        .then(function (response) {
+
+            let data = response.data
+            data.forEach(state => {
+                const option = document.createElement('option')
+                option.classList.add('option-state')
+                option.value = state.iso2
+                option.textContent = state.name
+                selectState.appendChild(option)
+            })
+
+
+
+        })
+}
+
+
+const selectCity = document.querySelector('.select-city')
+selectCity.addEventListener('change', () => { document.querySelector('.btn-register').removeAttribute('disabled') });
+async function load_cities_options() {
+
+    let selected_country = selectCountry.value
+    let selected_state = selectState.value
+
+    selectCity.innerHTML = '<option value="">Select City</option>'
+
+    axios.defaults.withCredentials = true;
+    axios.get(`?a=get_country_list&selected-country=${selected_country}&selected-state=${selected_state}`)
+        .then(function (response) {
+
+            let data = response.data
+
+            data.forEach(city => {
+                const option = document.createElement('option')
+                option.classList.add('option-cities')
+                option.value = city.name
+                option.textContent = city.name
+                selectCity.appendChild(option)
+
+            })
+        })
+}
+
+
+
 

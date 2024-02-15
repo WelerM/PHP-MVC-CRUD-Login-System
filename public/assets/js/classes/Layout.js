@@ -2,7 +2,7 @@ const form = document.querySelector('#img-form')
 const img_preview_container = document.querySelector('#img-preview')
 const container_modal_btns = document.querySelector('.container-modal-btns')
 const container_crud_btns = document.querySelector('.container-crud-btns')
-const container_img_suggestion = document.querySelector('.container-img-suggestion')
+const container_img_suggestion_1 = document.querySelector('.container-img-suggestion')
 const error_msg_text = document.querySelector('.error-msg-text')
 const container_add_img = document.querySelector('.container-add-img')
 const container_img_info = document.querySelector('.container-img-info')
@@ -18,7 +18,7 @@ const modal_container_add_img = document.querySelector('.container-add-img')
 
 
 
- class Layout {
+class Layout {
 
   constructor(elementSelector) {
     this.element = document.querySelector(elementSelector);
@@ -40,8 +40,8 @@ const modal_container_add_img = document.querySelector('.container-add-img')
     container_modal_btns.classList.add('d-none')
 
     //Hides container img suggestion
-    container_img_suggestion.classList.remove('d-flex')
-    container_img_suggestion.classList.add('d-none')
+    container_img_suggestion_1.classList.remove('d-flex')
+    container_img_suggestion_1.classList.add('d-none')
 
     //Hides error msg
     error_msg_text.classList.add('d-none')
@@ -61,8 +61,8 @@ const modal_container_add_img = document.querySelector('.container-add-img')
     container_img_info.classList.remove('d-flex')
     container_img_info.classList.add('d-none')
 
-    container_img_suggestion.classList.remove('d-none')
-    container_img_suggestion.classList.add('d-flex')
+    container_img_suggestion_1.classList.remove('d-none')
+    container_img_suggestion_1.classList.add('d-flex')
 
 
     container_modal_btns.classList.remove('d-none')
@@ -119,22 +119,34 @@ const modal_container_add_img = document.querySelector('.container-add-img')
 
 
   show_error_alert(error) {
-
+    
     let error_text;
+    let alert_title;
 
     if (error === 'filetoobig') {
+      alert_title  = 'Error'
       error_text = "The choosen file is too big. Plese select another one."
+  
     } else if (error === 'uploaderror') {
+      alert_title  = 'Error'
       error_text = "There was an error uploading your file."
+      
     } else if (error === 'filenotsupported') {
+      alert_title  = 'Error'
       error_text = "This image is not supported."
-    } else if (error = 'imgnameempty') {
-      error_text = "You need to add a name for the image."
+
+    } else if (error === 'imgnameempty') {
+      alert_title  = 'Error'
+      error_text = "You need to add a name for the imagee."
+
+    } else if (error === 'addnewimages') {
+      alert_title = "add new images!"
+      error_text = "Add new images to your gallery"
     }
 
 
     Swal.fire({
-      title: 'Error!',
+      title: alert_title,
       text: error_text,
       icon: 'warning'
     })
@@ -150,8 +162,8 @@ const modal_container_add_img = document.querySelector('.container-add-img')
     container_add_img.classList.remove('d-none')
     container_add_img.classList.add('d-flex')
 
-    container_img_suggestion.classList.remove('d-flex')
-    container_img_suggestion.classList.add('d-none')
+    container_img_suggestion_1.classList.remove('d-flex')
+    container_img_suggestion_1.classList.add('d-none')
 
 
     //Shows "crud" btn 

@@ -1,54 +1,92 @@
-<div class="bg-dark vh-100 " style="margin-top:100px">
+<div class="     vh-100 " style="margin-top:100px">
 
-    <div class="welcome-container bg-dark w-100">
+    <div class="welcome-container  w-100">
 
-        <form class=" p-4 text-light position-absolute " style="width:400px;top:50%;left:50%;transform: translate(-50%, -50%)" action="?a=signup" method="POST">
+        <form class=" p-4  position-absolute mt-5" style="width:400px;top:50%;left:50%;transform: translate(-50%, -50%)" action="?a=signup" method="POST">
 
-
-
-            <?php
-            if (isset($_SESSION['error'])) {
-                echo "<div class='alert alert-danger'>" . $_SESSION['error'] . "</div>";
-
-                unset($_SESSION['error']);
-            }
-
-            ?>
             <p class="text-center fs-2 mb-4">Create account</p>
+
+
+
 
             <div class="mb-3">
                 <label for="signup-name" class="form-label">Name</label>
 
-                <input value="weler" type="text" name="signup-name" class="form-control bg-dark text-light" id="signup-name" aria-describedby="emailHelp">
+                <input id="signup-name" required  type="text" name="signup-name" class="form-control  "  aria-describedby="emailHelp">
             </div>
+
+
+
 
 
             <div class="mb-3">
                 <label for="signup-email" class="form-label">Email address</label>
 
-                <input value="email@gmail.com" type="email" name="signup-email" class="form-control bg-dark text-light" id="signup-email" aria-describedby="emailHelp">
+                <input id="signup-email" required  type="email" name="signup-email" class="form-control"  aria-describedby="emailHelp">
 
-                <div class="form-text text-light">We'll never share your email with anyone else.</div>
+                <div class="form-text ">We'll never share your email with anyone else.</div>
             </div>
+
+
 
 
             <div class="mb-3">
 
                 <label for="signup-password" class="form-label">Password</label>
 
-                <input type="password" name="signup-password" class="form-control  bg-transparent text-light" id="signup-password">
+                <input id="signup-password" required type="password" name="signup-password" class="form-control   " >
 
             </div>
+
+
 
             <div class="mb-3">
 
                 <label for="signup-repeat-password" class="form-label">Repeat password</label>
 
-                <input type="password" name="signup-repeat-password" class="form-control  bg-transparent text-light" id="signup-repeat-password">
+                <input id="signup-repeat-password" required type="password" name="signup-repeat-password" class="form-control   " >
 
             </div>
 
-            <button type="submit" class="btn btn-success">Create</button>
+
+
+
+            <select  class="select-country form-select   mb-3" name="select-country" onchange="load_states_options()" aria-label="Default select example">
+
+                <option selected>Select Country</option>
+
+            </select>
+
+
+            <select  disabled class="select-state form-select   mb-3" name="select-state" onchange="load_cities_options()" aria-label="Default select example">
+
+                <option selected>Select State</option>
+
+            </select>
+
+
+            <select  disabled class="select-city form-select   mb-3" name="select-city" aria-label="Default select example">
+
+                <option selected>Select City</option>
+
+            </select>
+
+            
+            <?php
+            if (isset($_SESSION['error'])) {
+
+                if ($_SESSION['error'] != 'none') {
+
+                    echo "<div class='alert alert-danger mt-2'>" . $_SESSION['error'] . "</div>";
+                } else {
+                }
+
+                unset($_SESSION['error']);
+            }
+
+            ?>
+
+            <button  type="submit" class="btn-register btn btn-success">Register</button>
 
         </form>
 

@@ -26,9 +26,9 @@ class Functions
         }
     }
 
-    public static function ownerLogged()
+    public static function user_logged()
     {
-        return isset($_SESSION['adm']);
+        return isset($_SESSION['user_id']);
     }
 
     public static function createHash($num_characters = 12)
@@ -108,7 +108,6 @@ class Functions
                     }
                 }
             }
-
         }
         //==========================================================
 

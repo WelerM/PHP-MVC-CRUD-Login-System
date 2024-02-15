@@ -18,9 +18,9 @@
     <script src="assets/js/axios.min.js"></script>
     <script src="assets/js/sweetalert2@11.js" defer></script>
     <script src="assets/js/classes/Layout.js" defer></script>
-    <script src="assets/js/script.js" defer type="module"></script>
+    <script src="assets/js/script.js" defer ></script>
 
 </head>
 </head>
 
-<body class="bg-dark">
+<body class="">

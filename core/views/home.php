@@ -11,9 +11,9 @@ use core\classes\Functions;
 <div class=" main-container p-0 container-fluid bg-sucess  d-flex">
 
     <!-- Look display -->
-    <div class="look-container w-100 border-2 d-flex p-3 pt-0 flex-column" style="max-width:250px">
+    <div class="look-container w-100 border-2 d-flex p-3 pt-0 flex-column bg-body-tertiary" style="max-width:250px">
 
-        <span class="py-2 text-light text-center fw-bold  ">Your look</span>
+        <span class="py-2  text-center fw-bold  ">Your look</span>
 
         <!-- Displayed images will inside this div -->
         <div class="container-displayed-images d-flex flex-column"></div>
@@ -23,24 +23,32 @@ use core\classes\Functions;
     <!--     Look options -->
     <div class="border-2 w-100  d-flex flex-column justify-content-between p-0 position-relative ">
 
-        <ul class=" p-0 bg-dark  w-100 d-flex align-items-center justify-content-between " style="list-style:none;">
-            <li id="top" class="text-light w-100 px-0 py-2 m-0 text-center">top</li>
-            <li id="torso" class="text-light w-100 px-0 p-0  py-2  m-0 text-center">torso</li>
-            <li id="legs" class="text-light w-100 px-0 p-0  py-2 m-0 text-center">legs</li>
-            <li id="feet" class="text-light w-100 px-0 p-0  py-2 m-0 text-center">feet</li>
+        <ul class=" p-0   d-flex align-items-center justify-content-between " style="list-style:none;">
+            <li id="top" class=" w-100 px-0 py-2 m-0 text-center">top</li>
+            <li id="torso" class=" w-100 px-0 p-0  py-2  m-0 text-center">torso</li>
+            <li id="legs" class=" w-100 px-0 p-0  py-2 m-0 text-center">legs</li>
+            <li id="feet" class=" w-100 px-0 p-0  py-2 m-0 text-center">feet</li>
         </ul>
 
         <!--Saved images container -->
-        <div class="options-container h-100  position-relative bg-black">
+        <div class="options-container h-100  position-relative ">
 
-            <div class="flex-wrap"></div>
+            <div id="test-animal" class="flex-wrap"></div>
 
         </div>
 
 
-        <footer class="d-flex align-items-center justify-content-between bg-dark p-2 position-absolute  w-100" style="bottom:0">
+        <footer class="d-flex align-items-center justify-content-between  bg-body-tertiary border-top position-absolute  w-100 p-2" style="bottom:0">
 
             <div class="d-flex">
+                <!-- Temperature display -->
+                <div class="d-flex me-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" class="bi bi-thermometer" viewBox="0 0 16 16">
+                        <path d="M8 14a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
+                        <path d="M8 0a2.5 2.5 0 0 0-2.5 2.5v7.55a3.5 3.5 0 1 0 5 0V2.5A2.5 2.5 0 0 0 8 0M6.5 2.5a1.5 1.5 0 1 1 3 0v7.987l.167.15a2.5 2.5 0 1 1-3.333 0l.166-.15z" />
+                    </svg>
+                    <span id="temperature-text" class="ms-1  fw-bold"></span>
+                </div>
 
                 <button class="btn-suggestion btn btn-success p-1 px-2 mx-1  d-flex align-items-center justify-content-center ">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-heart me-1" viewBox="0 0 16 16">
@@ -56,16 +64,15 @@ use core\classes\Functions;
                     Add
                 </button>
 
+
+
+
             </div>
 
-            <!-- Temperature display -->
-            <div class="d-flex">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" class="bi bi-thermometer" viewBox="0 0 16 16">
-                    <path d="M8 14a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
-                    <path d="M8 0a2.5 2.5 0 0 0-2.5 2.5v7.55a3.5 3.5 0 1 0 5 0V2.5A2.5 2.5 0 0 0 8 0M6.5 2.5a1.5 1.5 0 1 1 3 0v7.987l.167.15a2.5 2.5 0 1 1-3.333 0l.166-.15z" />
-                </svg>
-                <span id="temperature-text" class="ms-1 text-light fw-bold"></span>
-            </div>
+            <form class="d-flex " role="search">
+                <input class="form-control me-2  border " type="search" placeholder="" aria-label="Search">
+                <button class="btn btn-success" type="submit">Search</button>
+            </form>
 
         </footer>
 
@@ -86,28 +93,27 @@ use core\classes\Functions;
 
     <div class="modal-dialog">
 
-        <div class="modal-content bg-dark">
-
+        <div class="modal-content ">
             <div class="modal-body d-flex flex-column">
 
                 <!-- img add container -->
                 <div class="container-add-img d-flex flex-column">
 
 
-                    <p class="d-none text-light text-center fw-bold"></p>
+                    <p class="d-none  text-center fw-bold"></p>
 
 
                     <!-- Img preview container -->
                     <img id="img-preview" class="d-none mb-2 mx-auto" src="" alt="">
 
 
-                    <form id="img-form" class="flex-column px-0 mt-1 py-1 text-light d-none" action="?a=save_image" enctype="multipart/form-data" method="POST">
+                    <form id="img-form" class="flex-column px-0 mt-1 py-1  d-none" action="?a=save_image" enctype="multipart/form-data" method="POST">
 
                         <!-- Img input file -->
                         <div id="container-input-file" class=" d-none mb-4">
 
 
-                            <label for="form-input" class="input-group-text d-flex align-items-center bg-transparent rounded-end-0 text-light">
+                            <label for="form-input" class="input-group-text d-flex align-items-center bg-transparent rounded-end-0 ">
 
                                 Choose new image
 
@@ -130,7 +136,7 @@ use core\classes\Functions;
 
                             <label for="input-img-name" class="form-label fw-bold">Choose a name for this piece:</label>
 
-                            <input id="input-img-name" type="text" class="form-control bg-dark text-light" name="input-img-name">
+                            <input id="input-img-name" type="text" class="form-control  " name="input-img-name">
 
                         </div>
 
@@ -229,27 +235,27 @@ use core\classes\Functions;
 
 
                 <!-- img info container -->
-                <div class="container-img-info text-light mb-3 flex-column" >
+                <div class="container-img-info  mb-3 flex-column">
 
-                    <p id="img-info-title" class="text-light fw-bold fs-5"></p>
+                    <p id="img-info-title" class=" fw-bold fs-5"></p>
 
                     <div class="d-flex">
 
                         <p class="mb-2">Recommended seasons:</p>
 
                         <!-- Seasons span container -->
-                        <div id="img-info-list-season" class="d-flex text-light p-0 mb-3 border-0" style="list-style:none;"></div>
+                        <div id="img-info-list-season" class="d-flex  p-0 mb-3 border-0" style="list-style:none;"></div>
 
                     </div>
 
                     <div class="d-flex">
                         <p class="mb-2">Recommended temperature:</p>
-                        <div id="img-info-list-temp" class="text-light p-0 mb-3 border-0 d-flex" style="list-style:none;"></div>
+                        <div id="img-info-list-temp" class=" p-0 mb-3 border-0 d-flex" style="list-style:none;"></div>
                     </div>
 
                 </div>
 
-                <p class="d-none error-msg-text text-light"></p>
+                <p class="d-none error-msg-text "></p>
 
 
 
@@ -304,6 +310,3 @@ use core\classes\Functions;
     </div>
 
 </div>
-
-
-

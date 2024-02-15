@@ -12,25 +12,27 @@ $root = $_SERVER["DOCUMENT_ROOT"] . '/buildlookmvc';
 require_once  $root . '/config.php';
 
 
+
 class Main
 {
 
     //PAGES
-
     //Welcome page
     public function home()
     {
 
-        if (!Functions::ownerLogged()) {
+        if (!Functions::user_logged()) {
+
 
             Functions::Layout([
                 'layouts/html_header',
                 'layouts/header',
                 'welcome',
-
+                'layouts/footer',
                 'layouts/html_footer',
             ]);
         } else {
+
             Functions::Layout([
                 'layouts/html_header',
                 'layouts/header',
@@ -40,9 +42,6 @@ class Main
             ]);
         }
     }
-    //===================================================================
-
-
     public function signup_page()
     {
 
@@ -54,10 +53,15 @@ class Main
             'layouts/html_footer',
         ]);
     }
-    //===================================================================
-
     public function signin_page()
     {
+
+        //Verifies if there's an open session
+        if (Functions::user_logged()) {
+            Functions::redirect();
+            return;
+        }
+
 
         Functions::Layout([
             'layouts/html_header',
@@ -67,7 +71,34 @@ class Main
             'layouts/html_footer',
         ]);
     }
+    public function email_sent_page()
+    {
+        Functions::Layout([
+            'layouts/html_header',
+            'layouts/header',
+            'email_sent_page',
+
+            'layouts/html_footer',
+        ]);
+    }
     //===================================================================
+
+
+
+    public static function is_user_logged()
+    {
+        //Verifies if there's an open session
+
+        if (Functions::user_logged()) {
+            // Functions::redirect();
+            echo 'true';
+        } else {
+            echo 'false';
+        }
+    }
+
+
+
 
 
     //Sign In
@@ -76,7 +107,7 @@ class Main
 
 
         //Verifies if there's an open session
-        if (Functions::ownerLogged()) {
+        if (Functions::user_logged()) {
             Functions::redirect();
             return;
         }
@@ -89,62 +120,64 @@ class Main
         }
 
 
-        //Checks for unset inputs 
-        if (!isset($_POST['login-email']) || !isset($_POST['login-password'])) {
+        //Verifies if input fields came correctly filled
+        if (
+            !isset($_POST['login-email']) ||
+            !isset($_POST['login-password'])
+
+        ) {
+
             $_SESSION['error'] = "Empty fields!";
-            Functions::redirect('signin_page');
-            return;
-        }
 
-        //Checks for empty fields
-        if (trim(empty($_POST['login-email'])) || trim(empty($_POST['login-password']))) {
-            $_SESSION['error'] = "Empty fields!";
-            Functions::redirect('signin_page');
-            return;
-        }
-
-        //Checks for valid email
-        if (filter_var(trim($_POST['login-email']), FILTER_VALIDATE_EMAIL) === false) {
-            $_SESSION['error'] = "Invalid email!";
             Functions::redirect('signin_page');
             return;
         }
 
 
+        //Prepare data to model
+        $user_email = trim(strtolower($_POST['login-email']));
+        $user_password = trim($_POST['login-password']);
 
-        $login = new Users();
 
-        //Verifies on database if the given username exists
-        if (!$login->verify_email_exists($_POST['login-email'])) {
-            $_SESSION['error'] = "Invalid email or password";
-            Functions::redirect('signin_page');
-            return;
-        }
 
         //Validate login
-        $email = trim(strtolower($_POST['login-email']));
-        $password = trim($_POST['login-password']);
-        $result = $login->validate_login($email, $password);
+        $users = new Users();
 
+        $result = $users->validate_login($user_email, $user_password);
 
-        if (is_bool($result)) {
+        if ($result === 'email doesnt exist') {
 
             //Invalid login
-            $_SESSION['error'] = 'Invalid login';
-            Functions::redirect();
+            $_SESSION['error'] = 'Invalid email or password';
+            Functions::redirect('signin_page');
+            return;
+        } else if ($result === 'email not confirmed') {
+
+            $_SESSION['error'] = 'Email is not confirmed';
+            Functions::redirect('signin_page');
+            return;
+        } else  if ($result === "passwords don't match") {
+
+            $_SESSION['error'] = "passwords don't match";
+            Functions::redirect('signin_page');
             return;
         } else {
 
             //Valid login
+            $_SESSION['user_id'] = $result->id;
+            $_SESSION['user_name'] = $result->user_name;
+            $_SESSION['user_email'] = $result->user_email;
 
-            $_SESSION['adm'] = $result->email;
+
+
             Functions::redirect();
+            return;
         }
     }
     //===================================================================
     public function signout()
     {
-        unset($_SESSION['adm']);
+        unset($_SESSION['user_id']);
         Functions::redirect();
     }
     //===================================================================
@@ -154,8 +187,11 @@ class Main
     public function signup()
     {
 
+
+
+
         //Verifies if there's an open session
-        if (Functions::ownerLogged()) {
+        if (Functions::user_logged()) {
             Functions::redirect();
             exit();
         }
@@ -173,7 +209,10 @@ class Main
             !isset($_POST['signup-name']) ||
             !isset($_POST['signup-email']) ||
             !isset($_POST['signup-password']) ||
-            !isset($_POST['signup-repeat-password'])
+            !isset($_POST['signup-repeat-password']) ||
+            !isset($_POST['select-country']) ||
+            !isset($_POST['select-state']) ||
+            !isset($_POST['select-city'])
         ) {
             $_SESSION['error'] = "Empty fields!";
             Functions::redirect('signup_page');
@@ -185,7 +224,12 @@ class Main
             trim(empty($_POST['signup-name'])) ||
             trim(empty($_POST['signup-email'])) ||
             trim(empty($_POST['signup-password'])) ||
-            trim(empty($_POST['signup-repeat-password']))
+            trim(empty($_POST['signup-repeat-password'])) ||
+            trim(empty($_POST['select-country'])) ||
+            trim(empty($_POST['select-state'])) ||
+            trim(
+                empty($_POST['select-city'])
+            )
         ) {
             $_SESSION['error'] = "Empty fields!";
             Functions::redirect('signup_page');
@@ -208,31 +252,73 @@ class Main
 
 
         //Verifies on DB if a client with same the email exists
-        $login = new Users();
+        $users = new Users();
 
-        if ($login->verify_email_exists($_POST['signup-email'])) {
+        if ($users->verify_email_exists($_POST['signup-email'])) {
 
             $_SESSION['error'] = "Email already taken!";
             Functions::redirect('signup_page');
             exit();
-        }   
+        }
 
 
 
 
+        $client_email = strtolower(trim($_POST['signup-email']));
+        $purl = $users->register_user();
 
-        $purl = $login->register_user();
-
-        //Create personal URL link to send through email
-        $link_purl = APP_BASE_URL . '?=confirm_email&purl=' . $purl;
-
-        //REady to send confirmation emaik
-
+        $email = new SendEmail();
+        $email->send_email($client_email, $purl);
+    }
 
 
+    public function confirm_email()
+    {
 
+        //Verifies if there's an open session
+        if (Functions::user_logged()) {
+            Functions::redirect();
+            return;
+        }
 
-        
+        //VErifies if purl exists in the url query
+        if (!isset($_GET['purl'])) {
+            Functions::redirect();
+            return;
+        }
+
+        $purl =  $_GET['purl'];
+
+        //Verifies if purl is valid
+        if (strlen($purl) != 12) {
+            Functions::redirect();
+            return;
+        }
+
+        $users = new Users();
+        $result = $users->validate_email($purl);
+
+        if ($result) {
+
+            $_SESSION['success'] = 'Emal confirmation successfull';
+
+            Functions::Layout([
+                'layouts/html_header',
+                'layouts/header',
+                'signin',
+                'layouts/html_footer',
+            ]);
+        } else {
+
+            $_SESSION['error'] = 'Couldt';
+
+            Functions::Layout([
+                'layouts/html_header',
+                'layouts/header',
+                'signin',
+                'layouts/html_footer',
+            ]);
+        }
     }
     //===================================================================
 
@@ -248,20 +334,29 @@ class Main
     public function display_img()
     {
 
-        $data_type = $_GET['data'];
 
-        $db = new Database();
+        //Verifies if there's an open session
+        if (Functions::user_logged()) {
 
-        $params = [
-            ':img_type' => $data_type
+            //Perguntar se existe imagem salva
+            $data_type = $_GET['data'];
 
-        ];
 
-        $results =  $db->select("SELECT * FROM images WHERE img_type = :img_type", $params);
+            $db = new Database();
 
-        $jsonArray = json_encode($results);
+            $params = [
+                ':img_type' => $data_type,
+                ':id_owner' => $_SESSION['user_id']
 
-        echo $jsonArray;
+            ];
+
+            $results =  $db->select("SELECT * FROM images WHERE img_type = :img_type AND id_owner = :id_owner", $params);
+
+
+
+            $jsonArray = json_encode($results);
+            echo $jsonArray;
+        }
     }
     //===================================================================
 
@@ -316,11 +411,6 @@ class Main
             return;
         }
 
-
-        $season_spring = null;
-        $season_summer = null;
-        $season_fall = null;
-        $season_winter = null;
 
         //Image file data
         $file = $_FILES['file'];
@@ -462,23 +552,25 @@ class Main
                 if ($fileSize < 1000000) {
 
                     $root = $_SERVER["DOCUMENT_ROOT"] . '/buildlookmvc/public';
-
+                    $id_user_logged = $_SESSION['user_id'];
 
 
                     //Inserts new image and updates database
                     $uniqueName = round(microtime(true) * 1000);
-                    $fileNameNew = $data_type . "_" . $uniqueName . "." . $fileActualExt;
+                    $fileNameNew = "id_" . $id_user_logged . "_" . $data_type . "_" . $uniqueName . "." . $fileActualExt;
                     $fileDestination = $root . '/assets/images/' . $data_type . '/' . $fileNameNew;
                     $file_src = '../assets/images/' . $data_type . '/' . $fileNameNew;
+
                     move_uploaded_file($fileTmpName, $fileDestination);
-                    $newFileName = $fileNameNew;
                     //===================================================================
 
 
+                    //Save image info into the database
                     $db = new Database();
-                    //insire no sql a extensao
-                    $params_2 = [
+
+                    $params = [
                         ':id' => '0',
+                        ':id_owner' => $_SESSION['user_id'],
 
                         ':img_type' => $data_type,
                         ':img_src' => substr($file_src, 3),
@@ -487,16 +579,20 @@ class Main
                         ':min_temp' => $min_temperature,
                         ':max_temp' => $max_temperature,
 
-                        ':season_spring' => $season_spring,
-                        ':season_summer' => $season_summer,
-                        ':season_fall' => $season_fall,
-                        ':season_winter' => $season_winter,
+                        ':season_spring' => $input_check_spring,
+                        ':season_summer' => $input_check_summer,
+                        ':season_fall' => $input_check_fall,
+                        ':season_winter' => $input_check_spring,
                         ':displayed' => 0,
+                        ':created_at' => 'NOW()',
+                        ':updated_at' => 'NOW()',
+                        ':deleted_at' => NULL
                     ];
 
 
                     $db->insert("INSERT INTO images VALUES(
                         :id, 
+                        :id_owner,
                         :img_type, 
                         :img_src, 
                         :img_name,
@@ -504,14 +600,19 @@ class Main
                         :min_temp, 
                         :max_temp, 
 
-                        season_spring = :season_spring, 
-                        season_summer = :season_summer, 
-                        season_fall = :season_fall, 
-                        season_winter = :season_winter,  
+                        :season_spring, 
+                         :season_summer, 
+                         :season_fall, 
+                         :season_winter,  
                         
-                        :displayed)", $params_2);
+                        :displayed,
+                        :created_at,
+                        :updated_at,
+                        :deleted_at)", $params);
+
 
                     //The variable "data" in the URL will be used inside the "start" function in the script.js file
+
                     Functions::redirect("home&data=$data_type&error=none");
                     exit();
                 } else {
@@ -685,22 +786,29 @@ class Main
     //Show wearing images
     public function show_wearing_parts()
     {
-        $db = new Database();
 
-        $params = [
-            ':displayed' => 1
-        ];
-        $top =  $db->select("SELECT * FROM images WHERE displayed = :displayed", $params);
 
-        $top_result = null;
+        //Verifies if there's an open session
+        if (Functions::user_logged()) {
 
-        if (count($top) === 0) {
-            $top_result = "default.png";
-        } else {
+            $db = new Database();
 
-            $jsonArray = json_encode($top);
+            $params = [
+                ':displayed' => 1,
+                ':id_owner' => $_SESSION['user_id']
+            ];
+            $top =  $db->select("SELECT * FROM images WHERE displayed = :displayed AND id_owner = :id_owner", $params);
 
-            echo $jsonArray;
+            $top_result = null;
+
+            if (count($top) === 0) {
+                $top_result = "default.png";
+            } else {
+
+                $jsonArray = json_encode($top);
+
+                echo $jsonArray;
+            }
         }
     }
     //===================================================================
@@ -751,20 +859,44 @@ class Main
     public function weather_api()
     {
 
-        if (isset($_GET['city']) && isset($_GET['country'])) {
-
-            $city = trim($_GET['city']);
-            $country = trim($_GET['country']);
-
-            if (!empty($city) || !empty($country)) {
-
-                $api = new Api();
-                $api->getWeatherByCity($city, $country);
-            } else {
-                echo null;
-            }
-        } else {
-            echo null;
+ 
+        $result = null;
+        //Verifies if there's an open session
+        if (!Functions::user_logged()) {
+            return $result;
         }
+
+ 
+        $user = new Users();
+        $user_location = $user->retrieve_user_location($_SESSION['user_id']);
+
+        $country =  $user_location[0]->user_country;
+        $city = $user_location[0]->user_city;
+        
+        $api = new Api();
+        $result = $api->getWeatherByCity($city, $country);
+
+        print_r($result);   
+    }
+
+    public function get_country_list()
+    {
+
+
+        $api = new Api();
+
+        if (isset($_GET['selected-country']) && isset($_GET['selected-state'])) { //Will return cities
+
+            $results = $api->getCountries($_GET['selected-country'], $_GET['selected-state']);
+        } else if (isset($_GET['selected-country'])) {
+
+            $results = $api->getCountries($_GET['selected-country']);
+        } else {
+
+            $results = $api->getCountries();
+        }
+
+        $jsonArray = json_encode($results);
+        echo $jsonArray;
     }
 }

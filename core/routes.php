@@ -17,6 +17,13 @@ $routes = [
     //Sign Out
     'signout' => 'main@signout',
 
+    //Email 
+    'email_sent' => 'main@email_sent',
+    'email_sent_page' => 'main@email_sent_page',
+    'confirm_email' => 'main@confirm_email',
+
+    'is_user_logged' => 'main@is_user_logged',
+
     //Crud
     'display_img' => 'main@display_img',
     'show_wearing_parts' => 'main@show_wearing_parts',
@@ -32,7 +39,9 @@ $routes = [
     //Delete image
     'delete_image' => 'main@delete_image',
 
+    //APIs
     'weather_api' => 'main@weather_api',
+    'get_country_list' => 'main@get_country_list'
 ];
 
 $action = 'home';
