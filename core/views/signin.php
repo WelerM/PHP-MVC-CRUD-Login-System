@@ -4,6 +4,25 @@
 
         <form class=" p-4  position-absolute " style="width:400px;top:50%;left:50%;transform: translate(-50%, -50%)" action="?a=signin" method="POST">
 
+
+            <p class="text-center text-success  fs-2 mb-4">Login</p>
+
+            <div class="mb-3">
+                <label for="login-email" class="form-label">Email address</label>
+
+                <input type="email" name="login-email" class="form-control" id="login-email" aria-describedby="emailHelp">
+
+
+            </div>
+
+            <div class="mb-3">
+
+                <label for="login-password" class="form-label">Password</label>
+
+                <input type="password" name="login-password" class="form-control  bg-transparent " id="login-password">
+
+            </div>
+
             <?php if (isset($_SESSION['error'])) :  ?>
 
                 <div class='alert alert-danger text-center'>
@@ -22,27 +41,8 @@
 
             <?php endif; ?>
 
-
-
-            <p class="text-center text-success  fs-2 mb-4">Login</p>
-
-            <div class="mb-3">
-                <label for="login-email" class="form-label">Email address</label>
-
-                <input type="email"  name="login-email" class="form-control" id="login-email"  aria-describedby="emailHelp">
-
-
-            </div>
-
-            <div class="mb-3">
-
-                <label for="login-password" class="form-label">Password</label>
-
-                <input type="password" name="login-password" class="form-control  bg-transparent " id="login-password">
-
-            </div>
-
-            <button type="submit" class="btn btn-success">Login</button>
+         
+            <button  type="submit" class="btn btn-success">Login</button>
 
         </form>
 

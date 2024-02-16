@@ -463,26 +463,6 @@ if (document.querySelector("#form-input")) {
 
 
 
-async function is_user_logged() {
-
-    axios.defaults.withCredentials = true;
-    axios.get('?a=is_user_logged')
-        .then(function (response) {
-
-            if (response.data === true) {
-
-                return true
-
-            } else {
-                return false
-            }
-
-        })
-
-
-}
-
-
 
 function start() {
 
@@ -535,8 +515,7 @@ function start() {
     }
 
     update_displayed_images()
-
-    // getWeather();
+     getWeather();
 
 } start();
 
@@ -976,15 +955,166 @@ async function getWeather() {
             current_temperature = null
         });
 }
-getWeather();
+
+
+async function is_user_logged() {
+
+    axios.defaults.withCredentials = true;
+    axios.get('?a=is_user_logged')
+        .then(function (response) {
+
+            if (response.data === true) {
+
+                return true
+
+            } else {
+                return false
+            }
+
+        })
+
+
+}
 
 
 
-//Sign up form
-//Esperando api
+
+
+
+
+//Form input treatment
+
+
+
+
+
+
+//Sign up form selects
+
+//Adds list of countries to the select tag
+
+
+
+//Input Name treatment
+//Usar parametro para deixar dinamico e usar no signin e signup
+function validateName(name) {
+
+    name = name.trim();
+
+
+    if (name === "") {
+
+        return "Name cannot be empty";
+    }
+
+
+    if (!/^[a-zA-Z]+$/.test(name)) {
+
+        return "Name can only contain letters.";
+
+    }
+
+    return true;
+
+}
+
+//Input Email treatment
+function validateEmail(email) {
+
+    email = email.trim();
+
+    if (email === "") {
+
+        return "Email cannot be empty.";
+    }
+
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+
+        return "Invalid email format.";
+    }
+
+    return true;
+}
+
+//Input Passwords treatment
+function validatePassword(password1, password2) {
+    // Trim the inputs to remove leading and trailing spaces
+    password1 = password1.trim();
+    password2 = password2.trim();
+
+    // Check if either password is empty
+    if (password1 === "" || password2 === "") {
+        return "Passwords cannot be empty.";
+    }
+
+    // Check if the passwords match
+    if (password1 !== password2) {
+        return "Passwords do not match.";
+    }
+
+    // Check password strength (e.g., minimum length)
+    if (password1.length < 8) {
+        return "Password must be at least 8 characters long.";
+    }
+
+    // Additional password strength validations can be added here, such as requiring special characters, numbers, etc.
+
+    // If all validations pass, return null (indicating no error)
+    return true;
+}
+
+//Select Country treatment
+function validateSelectCountry(selectValue) {
+
+
+    if (!selectValue || selectValue === "Select Country") {
+        return "Please select a country.";
+    }
+
+
+    return true;
+}
+
+//Select State treatment
+function validateSelectState(selectValue) {
+
+    if (!selectValue || selectValue === "Select State") {
+        return "Please select a state.";
+    }
+
+    return true;
+}
+//Select City treatment
+function validateSelectCity(selectValue) {
+
+    if (!selectValue || selectValue === "Select City") {
+        return "Please select a city.";
+    }
+
+    return true;
+}
+
+
 const selectCountry = document.querySelector('.select-country')
-selectCountry.addEventListener('change', () => { selectState.removeAttribute('disabled') });
+
 if (selectCountry) {
+
+    selectCountry.addEventListener('change', (e) => {
+
+        if (e.target.value === "Select Country") {
+            selectState.innerHTML = '<option >Select State</option>'
+            selectCity.innerHTML = '<option >Select City</option>'
+            selectState.setAttribute('disabled', 'true')
+            selectCity.setAttribute('disabled', 'true')
+        } else {
+            selectState.removeAttribute('disabled')
+        }
+
+    });
+
 
     async function load_country_options() {
         axios.defaults.withCredentials = true;
@@ -1002,9 +1132,6 @@ if (selectCountry) {
                 })
 
 
-                //Removes "disabled" attribuete from the select tag below (select city)
-
-
             })
     }
     window.onload = load_country_options
@@ -1012,58 +1139,168 @@ if (selectCountry) {
 
 
 const selectState = document.querySelector('.select-state')
-selectState.addEventListener('change', () => { selectCity.removeAttribute('disabled') });
+
+if (selectState) {
+
+    selectState.addEventListener('change', (e) => {
+
+        if (e.target.value != "") {
+
+            selectCity.removeAttribute('disabled')
+
+        } else {
+            selectCity.innerHTML = '<option >Select City</option>'
+
+            selectCity.setAttribute('disabled', 'true')
+        }
+
+    });
+
+}
 async function load_states_options() {
 
     let selected_country = selectCountry.value
 
-    selectState.innerHTML = '<option value="">Select State</option>'
+    if (selected_country != "Select Country") {
 
-    axios.defaults.withCredentials = true;
-    axios.get(`?a=get_country_list&selected-country=${selected_country}`)
-        .then(function (response) {
+        selectState.innerHTML = '<option value="">Select State</option>'
 
-            let data = response.data
-            data.forEach(state => {
-                const option = document.createElement('option')
-                option.classList.add('option-state')
-                option.value = state.iso2
-                option.textContent = state.name
-                selectState.appendChild(option)
+        axios.defaults.withCredentials = true;
+        axios.get(`?a=get_country_list&selected-country=${selected_country}`)
+            .then(function (response) {
+
+                let data = response.data
+
+                data.forEach(state => {
+                    const option = document.createElement('option')
+                    option.classList.add('option-state')
+                    option.value = state.iso2
+                    option.textContent = state.name
+                    selectState.appendChild(option)
+                })
             })
+    }
 
-
-
-        })
 }
 
 
 const selectCity = document.querySelector('.select-city')
-selectCity.addEventListener('change', () => { document.querySelector('.btn-register').removeAttribute('disabled') });
-async function load_cities_options() {
+if (selectCity) {
+    selectCity.addEventListener('change', (e) => {
+        if (e.target.value != "Select City") {
 
+            document.querySelector('.btn-register').removeAttribute('disabled')
+        } else {
+            document.querySelector('.btn-register').setAttribute('disabled', 'true')
+        }
+    });
+
+}
+async function load_cities_options() {
     let selected_country = selectCountry.value
     let selected_state = selectState.value
 
-    selectCity.innerHTML = '<option value="">Select City</option>'
 
-    axios.defaults.withCredentials = true;
-    axios.get(`?a=get_country_list&selected-country=${selected_country}&selected-state=${selected_state}`)
-        .then(function (response) {
+    if (selected_state != "Select State") {
 
-            let data = response.data
+        selectCity.innerHTML = '<option >Select City</option>'
 
-            data.forEach(city => {
-                const option = document.createElement('option')
-                option.classList.add('option-cities')
-                option.value = city.name
-                option.textContent = city.name
-                selectCity.appendChild(option)
+        axios.defaults.withCredentials = true;
+        axios.get(`?a=get_country_list&selected-country=${selected_country}&selected-state=${selected_state}`)
+            .then(function (response) {
 
+                let data = response.data
+
+                data.forEach(city => {
+                    const option = document.createElement('option')
+                    option.classList.add('option-cities')
+                    option.value = city.name
+                    option.textContent = city.name
+                    selectCity.appendChild(option)
+                })
             })
-        })
+    }
 }
 
 
+//Btn Register
+if (document.querySelector('.btn-register')) {
+    document.querySelector('.btn-register').addEventListener('click', (e) => {
+        console.log('clicked');
+
+        let input_name_register = document.querySelector('#signup-name').value
+        let input_email_register = document.querySelector('#signup-email').value
+        let input_password = document.querySelector('#signup-password').value
+        let input_password_repeat = document.querySelector('#signup-repeat-password').value
+        let select_country = document.querySelector('.select-country').value
+        let select_state = document.querySelector('.select-state').value
+        let select_city = document.querySelector('.select-city').value
+
+        let alertError = document.querySelector('.js-alert-error')
+        let arr_error_msg = []
+
+        //Name
+        if (validateName(input_name_register) === true) {
+            alertError.textContent = ''
+            alertError.classList.add('d-none')
+        } else {
+            arr_error_msg.push(validateName(input_name_register))
+
+        }
+
+        //Email
+        if (validateEmail(input_email_register) === true) {
+            alertError.textContent = ''
+            alertError.classList.add('d-none')
+        } else {
+            arr_error_msg.push(validateEmail(input_email_register))
+        }
+
+        //Passwords
+        if (validatePassword(input_password, input_password_repeat) === true) {
+            alertError.textContent = ''
+            alertError.classList.add('d-none')
+        } else {
+            arr_error_msg.push(validatePassword(input_password, input_password_repeat))
+        }
+
+        //Select Country
+        if (validateSelectCountry(select_country) === true) {
+            alertError.textContent = ''
+            alertError.classList.add('d-none')
+
+        } else {
+            arr_error_msg.push(validateSelectCountry(select_country));
+        }
+
+        //Select State
+        if (validateSelectState(select_state) === true) {
+            alertError.textContent = ''
+            alertError.classList.add('d-none')
+        } else {
+            arr_error_msg.push(validateSelectState(select_state));
+        }
+
+        //Select city
+        if (validateSelectCity(select_city) === true) {
+            alertError.textContent = ''
+            alertError.classList.add('d-none')
+        } else {
+            arr_error_msg.push(validateSelectCity(select_city));
+        }
+
+
+
+        if (arr_error_msg.length != 0) {
+            e.preventDefault();
+
+            alertError.textContent = arr_error_msg[0]
+            alertError.classList.remove('d-none')
+        }
+
+
+    })
+
+}
 
 
