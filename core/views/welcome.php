@@ -1,6 +1,6 @@
 <div class="container d-flex flex-column justify-content-center align-items-center vh-100 ">
 
-    <p class="mb-2 fs-4 ">Welcome to <span class="fw-bold text-success">Build Look</span>!</p>
+    <p class="mb-2 fs-4 ">Welcome to <span class="fw-bold text-success">Look Builder</span>!</p>
     
     <p class="mb-3 ">To start using our app, either create an account or enter your signin.</p>
    
