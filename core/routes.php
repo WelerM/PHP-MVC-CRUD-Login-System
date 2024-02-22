@@ -26,17 +26,13 @@ $routes = [
 
     //Crud
     'display_img' => 'main@display_img',
+    'search_img_by_name' => 'main@search_img_by_name',
     'show_wearing_parts' => 'main@show_wearing_parts',
     'show_suggestion' => 'main@show_suggestion',
     'show_img_info' => 'main@show_img_info',
     'save_image' => 'main@save_image',
-
-    //Use image
     'use_image' => 'main@use_image',
-    //Edit image
     'edit_image' => 'main@edit_image',
-
-    //Delete image
     'delete_image' => 'main@delete_image',
 
     //APIs

@@ -47,15 +47,7 @@ class Users
         $params = [
             ':id' => $client_id
         ];
-        $db->update(
-            "
-        UPDATE users SET 
-        purl = NULL,
-        active = 1,
-        updated_at = NOW() 
-        WHERE id = :id",
-            $params
-        );
+        $db->update("UPDATE users SET purl = NULL, active = 1, updated_at = NOW() WHERE id = :id", $params);
 
         return true;
     }

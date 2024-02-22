@@ -70,8 +70,8 @@ use core\classes\Functions;
             </div>
 
             <form class="d-flex " role="search">
-                <input class="form-control me-2  border " type="search" placeholder="" aria-label="Search">
-                <button class="btn btn-success" type="submit">Search</button>
+                <input class="input-search form-control me-2  border " type="search" aria-label="Search">
+                <button class="btn-search btn btn-success">Search</button>
             </form>
 
         </footer>
@@ -100,6 +100,7 @@ use core\classes\Functions;
                 <div class="container-add-img d-flex flex-column">
 
 
+
                     <p class="d-none  text-center fw-bold"></p>
 
 
@@ -109,7 +110,8 @@ use core\classes\Functions;
 
                     <form id="img-form" class="flex-column px-0 mt-1 py-1  d-none" action="?a=save_image" enctype="multipart/form-data" method="POST">
 
-                        <!-- Img input file -->
+
+                        <!-- Img input file HIDDEN-->
                         <div id="container-input-file" class=" d-none mb-4">
 
 
@@ -125,81 +127,113 @@ use core\classes\Functions;
 
                             <input id="form-input" type="file" class=" custom-file-button form-control rounded-0 rounded-end-1 " name="file">
 
-                            <!-- Handled by JAVASCRIPT -->
-                            <input id="form-input-type" class="d-none" type="text" name="data-type">
 
                         </div>
 
 
-                        <!-- Img name input -->
+                        <!-- Img name input trigger SHOWN-->
+                        <button class="btn btn-add-img d-flex align-items-center border mb-3">
+
+                            Choose an image
+
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-image ms-2" viewBox="0 0 16 16">
+                                <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
+                                <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm13 1a.5.5 0 0 1 .5.5v6l-3.775-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12v.54L1 12.5v-9a.5.5 0 0 1 .5-.5z" />
+                            </svg>
+
+                        </button>
+
+
+                        <!-- Img name input-->
                         <div class="mb-3">
 
-                            <label for="input-img-name" class="form-label fw-bold">Choose a name for this piece:</label>
+                            <label for="input-img-name" class="form-label fw-bold d-none"></label>
 
-                            <input id="input-img-name" type="text" class="form-control  " name="input-img-name">
+                            <input id="input-img-name" type="text" class="form-control" name="input-img-name" placeholder="Choose a name for this piece">
 
                         </div>
+
 
 
                         <!-- Input check seasons -->
-                        <div class="border p-2 mb-3">
+                        <div class="border rounded p-0 mb-3">
 
-                            <p class="fw-bold">Choose at least two seasons that you think would match for this piece: </p>
+                            <button class="btn d-flex align-items-center border-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-seasons" aria-expanded="false" aria-controls="collapse-seasons">
+                                Attribute seasons for this piece
 
-                            <!-- Alert Error -->
-                            <div class="d-none alert alert-danger  align-items-center" role="alert">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
-                                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill ms-2" viewBox="0 0 16 16">
+                                    <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
                                 </svg>
-                                <div class="alert-danger-text fw-bold ms-2"></div>
+                            </button>
+
+                            <div class="collapse mt-2 px-2 pb-2" id="collapse-seasons">
+
+                                <div class="d-flex justify-content-between mb-0" style="user-select: none;">
+
+                                    <!-- Spring -->
+                                    <div class="mb-0 form-check">
+                                        <input type="checkbox" name="spring-check" class="form-check-input input-spring" id="spring-check">
+                                        <label class="form-check-label " for="spring-check">Spring</label>
+                                    </div>
+
+                                    <!-- Summer -->
+                                    <div class="mb-0 form-check">
+                                        <input type="checkbox" name="summer-check" class="form-check-input input-summer" id="summer-check">
+                                        <label class="form-check-label" for="summer-check">Summer</label>
+                                    </div>
+
+                                    <!-- Fall -->
+                                    <div class="mb-0 form-check">
+                                        <input type="checkbox" name="fall-check" class="form-check-input input-fall" id="fall-check">
+                                        <label class="form-check-label" for="fall-check">Fall</label>
+                                    </div>
+
+                                    <!-- Winter -->
+                                    <div class="mb-0 form-check">
+                                        <input type="checkbox" name="winter-check" class="form-check-input input-winter" id="winter-check">
+                                        <label class="form-check-label" for="winter-check">Winter</label>
+                                    </div>
+
+                                </div>
+
                             </div>
 
-
-                            <div class="d-flex justify-content-between mb-0">
-
-                                <div class="mb-0 form-check">
-                                    <input type="checkbox" name="spring-check" class="form-check-input" id="spring-check">
-                                    <label class="form-check-label" for="spring-check">Spring</label>
-                                </div>
-                                <div class="mb-0 form-check">
-                                    <input type="checkbox" name="summer-check" class="form-check-input" id="summer-check">
-                                    <label class="form-check-label" for="summer-check">Summer</label>
-                                </div>
-                                <div class="mb-0 form-check">
-                                    <input type="checkbox" name="fall-check" class="form-check-input" id="fall-check">
-                                    <label class="form-check-label" for="fall-check">Fall</label>
-                                </div>
-                                <div class="mb-0 form-check">
-                                    <input type="checkbox" name="winter-check" class="form-check-input" id="winter-check">
-                                    <label class="form-check-label" for="winter-check">Winter</label>
-                                </div>
-
-                                <div class="mb-0 form-check">
-                                    <input type="checkbox" name="all-seasons-check" class="form-check-input" id="all-seasons-check">
-                                    <label class="form-check-label" for="all-seasons-check">All seasons</label>
-                                </div>
-
-                            </div>
 
                         </div>
 
 
                         <!-- Min and Max temperature range inputs -->
-                        <div class="border p-2 mb-2 d-flex flex-column ">
+                        <div class="border rounded p-2 mb-2 ">
 
-                            <p class="fw-bold">Set an ideal temperature for this piece:</p>
+                            <button class="btn d-flex align-items-center p-0 border-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-temperature" aria-expanded="false" aria-controls="collapse-temperature">
+                                Set an ideal temperature for this piece
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill ms-2" viewBox="0 0 16 16">
+                                    <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
+                                </svg>
+                            </button>
 
-                            <label for="input-min-range" class="form-label form-label-min-temp mb-0">Min:</label>
+                            <div class="collapse" id="collapse-temperature">
 
-                            <input id="input-min-range" class="form-range" name="input-min-range" min="0" max="30" type="range">
+                                <label for="input-min-range" class="form-label form-label-min-temp mb-0">Min:</label>
+
+                                <input id="input-min-range" class="form-range" name="input-min-range" min="0" max="30" type="range">
 
 
 
-                            <label for="input-max-range" class="form-label form-label-max-temp mb-0">Max:</label>
+                                <label for="input-max-range" class="form-label form-label-max-temp mb-0">Max:</label>
 
-                            <input id="input-max-range" class="form-range" name="input-max-range" max="50" type="range">
+                                <input id="input-max-range" class="form-range" name="input-max-range" max="50" type="range">
+
+                            </div>
+
+
 
                         </div>
+
+
+                        <!-- Handled by JAVASCRIPT -->
+                        <input id="form-input-type" class="d-none" type="text" name="data-type">
+
 
 
                         <!-- Hidden input img id for UPDATES -->
@@ -208,6 +242,8 @@ use core\classes\Functions;
                             <input id="input-img-id" class="form-control d-none" name="input-img-id" type="text">
 
                         </div>
+
+
 
 
 
@@ -225,6 +261,8 @@ use core\classes\Functions;
                                     <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
                                 </svg>
                                 Close</button>
+
+
                         </div>
 
                     </form>
@@ -249,7 +287,9 @@ use core\classes\Functions;
                     </div>
 
                     <div class="d-flex">
+
                         <p class="mb-2">Recommended temperature:</p>
+
                         <div id="img-info-list-temp" class=" p-0 mb-3 border-0 d-flex" style="list-style:none;"></div>
                     </div>
 
@@ -299,9 +339,6 @@ use core\classes\Functions;
                     </button>
 
                 </div>
-
-
-
 
             </div>
 

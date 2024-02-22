@@ -359,6 +359,31 @@ class Main
         }
     }
     //===================================================================
+    public function search_img_by_name(){
+        $name = $_GET['data'];
+  
+        $db = new Database();
+
+        $params = [
+            ':img_name' => $name,
+            ':id_owner' => $_SESSION['user_id']
+
+        ];
+
+        $results =  $db->select(
+            "SELECT * FROM images 
+             WHERE img_name 
+             LIKE CONCAT('%', :img_name, '%') 
+             AND id_owner = :id_owner ", $params);
+
+
+
+        $jsonArray = json_encode($results);
+        echo $jsonArray;
+    }
+
+
+
 
     public function use_image()
     {
@@ -431,11 +456,11 @@ class Main
         $max_temperature  = $_POST['input-max-range'];
 
         $img_name = null;
-        $input_check_spring = null;
-        $input_check_summer = null;
-        $input_check_fall  = null;
-        $input_check_winter = null;
-        $input_check_all_seasons = null;
+        $input_check_spring = false;
+        $input_check_summer = false;
+        $input_check_fall  = false;
+        $input_check_winter = false;
+
         //=============================================================
 
 
@@ -460,90 +485,71 @@ class Main
 
 
 
-        //Checks if all season input checks are empty
-        if (
-            empty($_POST['spring-check']) &&
-            empty($_POST['summer-check']) &&
-            empty($_POST['fall-check']) &&
-            empty($_POST['winter-check']) &&
-            empty($_POST['all-seasons-check'])
-        ) {
-            Functions::redirect("home&data=$data_type&error=allinputcheckempty");
-            exit();
-        }
+
         //=============================================================
 
 
-        //Checks if user has checked "All Seasons"
-        if (isset($_POST['all-seasons-check'])) {
 
-            $input_check_all_seasons = true;
+        //check 
+        if (isset($_POST['spring-check'])) {
+            $input_check_spring = true;
         } else {
-            //If users hasn't check "All seasons", the program will work on the specific seasons they choose
+            $input_check_spring = false;
+        }
 
-            //check 
-            if (isset($_POST['spring-check'])) {
-                $input_check_spring = $_POST['spring-check']; //On
-            } else {
-                $input_check_spring = false;
-            }
+        //Summer
+        if (isset($_POST['summer-check'])) {
+            $input_check_summer = true;
+        } else {
+            $input_check_summer = false;
+        }
 
-            //Summer
-            if (isset($_POST['summer-check'])) {
-                $input_check_summer = $_POST['summer-check'];
-            } else {
-                $input_check_summer = false;
-            }
+        //Fall
+        if (isset($_POST['fall-check'])) {
+            $input_check_fall = true;
+        } else {
+            $input_check_fall = false;
+        }
 
-            //Fall
-            if (isset($_POST['fall-check'])) {
-                $input_check_fall = $_POST['fall-check'];
-            } else {
-                $input_check_fall = false;
-            }
-
-            //Winter
-            if (isset($_POST['winter-check'])) {
-                $input_check_winter = $_POST['winter-check'];
-            } else {
-                $input_check_winter = false;
-            }
+        //Winter
+        if (isset($_POST['winter-check'])) {
+            $input_check_winter = true;
+        } else {
+            $input_check_winter = false;
+        }
 
 
-            //Creates array of user's choosen seasons
-            $arr_choosen_seasons_filtered = array();
+        //Creates array of user's choosen seasons
+        $arr_choosen_seasons_filtered = array();
 
-            $arr_choosen_seasons = [
-                'spring' => $input_check_spring,
-                'summer' => $input_check_summer,
-                'fall' => $input_check_fall,
-                'winter' => $input_check_winter,
-            ];
+        $arr_choosen_seasons = [
+            'spring' => $input_check_spring,
+            'summer' => $input_check_summer,
+            'fall' => $input_check_fall,
+            'winter' => $input_check_winter,
+        ];
 
 
-            //Sets user's choosen "input check seasons" to true 
-            foreach ($arr_choosen_seasons as $key => $value) {
+        //Sets user's choosen "input check seasons" to true 
+        foreach ($arr_choosen_seasons as $key => $value) {
 
-                if ($value === 'on') {
 
-                    $arr_choosen_seasons_filtered[$key] = $value;
+            if ($value === true) {
 
-                    if ($key === 'spring') {
-                        $input_check_spring = true;
-                    } else if ($key === 'summer') {
-                        $input_check_summer = true;
-                    } else if ($key === 'fall') {
-                        $input_check_fall = true;
-                    } else if ($key === 'winter') {
-                        $input_check_winter = true;
-                    }
+                $arr_choosen_seasons_filtered[$key] = $value;
+
+                if ($key === 'spring') {
+                    $input_check_spring = true;
+                } else if ($key === 'summer') {
+                    $input_check_summer = true;
+                } else if ($key === 'fall') {
+                    $input_check_fall = true;
+                } else if ($key === 'winter') {
+                    $input_check_winter = true;
                 }
             }
-            //Gets the assoative name from the index of the $arr_choosen_seasons_filtered array
-            $keys = array_keys($arr_choosen_seasons_filtered);
         }
         //=============================================================
-
 
 
         //Img ready to be uploaded 
@@ -571,7 +577,6 @@ class Main
                     $params = [
                         ':id' => '0',
                         ':id_owner' => $_SESSION['user_id'],
-
                         ':img_type' => $data_type,
                         ':img_src' => substr($file_src, 3),
                         ':img_name' => $img_name,
@@ -583,14 +588,12 @@ class Main
                         ':season_summer' => $input_check_summer,
                         ':season_fall' => $input_check_fall,
                         ':season_winter' => $input_check_spring,
-                        ':displayed' => 0,
-                        ':created_at' => 'NOW()',
-                        ':updated_at' => 'NOW()',
-                        ':deleted_at' => NULL
+                        ':displayed' => 0
+
                     ];
 
 
-                    $db->insert("INSERT INTO images VALUES(
+                    $res =  $db->insert("INSERT INTO images VALUES(
                         :id, 
                         :id_owner,
                         :img_type, 
@@ -606,15 +609,17 @@ class Main
                          :season_winter,  
                         
                         :displayed,
-                        :created_at,
-                        :updated_at,
-                        :deleted_at)", $params);
-
+                        NOW(),
+                        NOW(),
+                        NULL
+                        )", $params);
 
                     //The variable "data" in the URL will be used inside the "start" function in the script.js file
-
                     Functions::redirect("home&data=$data_type&error=none");
                     exit();
+
+
+
                 } else {
                     Functions::redirect("home&data=$data_type&error=filetoobig");
                     exit();
@@ -657,58 +662,53 @@ class Main
         //=============================================================
 
 
-        //Checks if all season input checks are empty
-        if (
-            empty($_POST['spring-check']) &&
-            empty($_POST['summer-check']) &&
-            empty($_POST['fall-check']) &&
-            empty($_POST['winter-check']) &&
-            empty($_POST['all-seasons-check'])
-        ) {
-            Functions::redirect("home&data=" . $_POST['data-type'] . "&error=allinputcheckempty");
-            exit();
-        }
-        //=============================================================
-
 
 
 
         //Handle input check seasons and call function to edit
-        $input_check_all_seasons = null;
-        $input_check_spring = null;
-        $input_check_summer = null;
-        $input_check_fall = null;
-        $input_check_winter = false;
+        $input_check_spring = 'false';
+        $input_check_summer = true;
+        $input_check_fall = true;
+        $input_check_winter = true;
 
-
-        if (isset($_POST['all-seasons-check'])) { //User chose "All Seasons"
-
-            $input_check_all_seasons = true; //$_POST['all-seasons-check'];
-        }
 
         //If users hasn't check "All seasons", the program will work on the specific seasons they choose
         //check separately if each "season" input checks are checked
 
         //Spring
         if (isset($_POST['spring-check'])) {
-            $input_check_spring = true; //$_POST['spring-check']; //On
+
+            $input_check_spring = true;
+        } else {
+            $input_check_spring = false;
         }
+
 
         //Summer
         if (isset($_POST['summer-check'])) {
-            $input_check_summer = $_POST['summer-check'];
+
+            $input_check_summer = true;
+        } else {
+            $input_check_summer = false;
         }
+
 
         //Fall
         if (isset($_POST['fall-check'])) {
-            $input_check_fall = $_POST['fall-check'];
+
+            $input_check_fall = true;
+        } else {
+            $input_check_fall = false;
         }
+
 
         //Winter
         if (isset($_POST['winter-check'])) {
-            $input_check_winter = $_POST['winter-check'];
-        }
 
+            $input_check_winter = true;
+        } else {
+            $input_check_winter = false;
+        }
 
 
         Functions::edit_image(
@@ -721,7 +721,7 @@ class Main
             $input_check_summer,
             $input_check_fall,
             $input_check_winter,
-            $input_check_all_seasons,
+
 
             $_POST['data-type'],
             $_FILES['file']
@@ -851,6 +851,8 @@ class Main
 
         echo $jsonArray;
     }
+
+
     //===================================================================
 
 
@@ -859,24 +861,24 @@ class Main
     public function weather_api()
     {
 
- 
+
         $result = null;
         //Verifies if there's an open session
         if (!Functions::user_logged()) {
             return $result;
         }
 
- 
+
         $user = new Users();
         $user_location = $user->retrieve_user_location($_SESSION['user_id']);
 
         $country =  $user_location[0]->user_country;
         $city = $user_location[0]->user_city;
-        
+
         $api = new Api();
         $result = $api->getWeatherByCity($city, $country);
 
-        print_r($result);   
+        print_r($result);
     }
 
     public function get_country_list()

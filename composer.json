@@ -1,5 +1,5 @@
 {
-    "name": "weler/mvcsistemaagendamento",
+    "name": "weler/build_look",
     "description": "personal Project",
     "type": "project",
     "autoload": {
@@ -10,7 +10,7 @@
     "authors": [
         {
             "name": "Weler S Martins",
-            "email": "welerson25@yahoo.com"
+            "email": "welerson194@gmail.com"
         }
     ],
     "require": {

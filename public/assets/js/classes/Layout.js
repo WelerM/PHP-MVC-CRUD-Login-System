@@ -11,7 +11,7 @@ const btn_use = document.querySelector('#btn-use')
 const btn_remove = document.querySelector('.btn-remove')
 const modal_container_info_img = document.querySelector('.container-img-info')
 const modal_container_add_img = document.querySelector('.container-add-img')
-
+const btn_choose_img = document.querySelector('.btn-add-img')
 
 
 
@@ -79,8 +79,8 @@ class Layout {
     container_add_img.classList.remove('d-none')
     container_add_img.classList.remove('flex-column-reverse')
 
-    container_input_file.classList.remove('d-none')
-    container_input_file.classList.add('d-flex')
+    //container_input_file.classList.remove('d-none')
+    //container_input_file.classList.add('d-flex')
 
 
     container_modal_btns.classList.remove('d-flex')
@@ -137,7 +137,7 @@ class Layout {
 
     } else if (error === 'imgnameempty') {
       alert_title  = 'Error'
-      error_text = "You need to add a name for the imagee."
+      error_text = "You need to add a name for the image."
 
     } else if (error === 'addnewimages') {
       alert_title = "add new images!"
@@ -196,5 +196,12 @@ class Layout {
     //Hides form
     form.classList.remove('d-flex')
     form.classList.add('d-none')
+  }
+
+
+  btn_choose_img(){
+    console.log('called');
+    document.querySelector('#form-input').click();
+
   }
 }

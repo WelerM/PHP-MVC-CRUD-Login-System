@@ -40,7 +40,7 @@ class Functions
     }
 
     public static function redirect($route = '')
-    {
+    {   
         header("Location: " . APP_BASE_URL . "?a=$route");
     }
 
@@ -49,19 +49,15 @@ class Functions
         $img_name,
         $min_temperature,
         $max_temperature,
-        $input_check_spring = null,
-        $input_check_summer = null,
-        $input_check_fall = null,
-        $input_check_winter = null,
-        $input_check_all_seasons = null,
+
+        $input_check_spring = 0,
+        $input_check_summer = 0,
+        $input_check_fall = 0,
+        $input_check_winter = 0,
+
         $img_type,
         $img_file
     ) {
-
-        $season_spring = null;
-        $season_summer = null;
-        $season_fall = null;
-        $season_winter = null;
 
         $file = $img_file;
         $fileName = $img_file['name'];
@@ -76,41 +72,40 @@ class Functions
 
 
         //Validate input check seasons
-        if ($input_check_all_seasons === null) { //User chose some seasons
 
 
-            //Creates array of user's choosen seasons
-            $arr_choosen_seasons_filtered = array();
+        //Creates array of user's choosen seasons
+        $arr_choosen_seasons_filtered = array();
 
-            $arr_choosen_seasons = [
-                'spring' => $input_check_spring,
-                'summer' => $input_check_summer,
-                'fall' => $input_check_fall,
-                'winter' => $input_check_winter,
-            ];
+        $arr_choosen_seasons = [
+            'spring' => $input_check_spring,
+            'summer' => $input_check_summer,
+            'fall' => $input_check_fall,
+            'winter' => $input_check_winter,
+        ];
 
 
-            //Sets user's choosen "input check seasons" to true 
-            foreach ($arr_choosen_seasons as $key => $value) {
+        //Sets user's choosen "input check seasons" to true 
 
-                if ($value === 'on') {
+        foreach ($arr_choosen_seasons as $key => $value) {
+  
+            if ($value === 1) {
 
-                    $arr_choosen_seasons_filtered[$key] = $value;
-
-                    if ($key === 'spring') {
-                        $input_check_spring = true;
-                    } else if ($key === 'summer') {
-                        $input_check_summer = true;
-                    } else if ($key === 'fall') {
-                        $input_check_fall = true;
-                    } else if ($key === 'winter') {
-                        $input_check_winter = true;
-                    }
+                $arr_choosen_seasons_filtered[$key] = $value;
+                
+                if ($key === 'spring') {
+                    $input_check_spring = 1;
+                } else if ($key === 'summer') {
+                    $input_check_summer = 1;
+                } else if ($key === 'fall') {
+                    $input_check_fall = 1;
+                } else if ($key === 'winter') {
+                    $input_check_winter = 1;
                 }
             }
         }
+      
         //==========================================================
-
 
 
 
@@ -206,9 +201,10 @@ class Functions
             $fileNameNew = $img_file_name;
         }
 
+        
 
+        $params_1 = [
 
-        $params = [
             ':id' => $img_id,
 
             ':img_type' => $img_type,
@@ -218,31 +214,31 @@ class Functions
             ':min_temp' => $min_temperature,
             ':max_temp' => $max_temperature,
 
-            ':season_spring' => $season_spring,
-            ':season_summer' => $season_summer,
-            ':season_fall' => $season_fall,
-            ':season_winter' => $season_winter,
+            ':season_spring' => $input_check_spring,
+            ':season_summer' => $input_check_summer,
+            ':season_fall' => $input_check_fall,
+            ':season_winter' => $input_check_winter,
+            
 
-            ':displayed' => $is_img_displayed,
         ];
 
 
-        $db->update("UPDATE images set 
+        $res =  $db->update("UPDATE images set 
+
             img_type = :img_type,
             img_src = :img_src, 
-            img_name =:img_name,
+            img_name = :img_name,
             img_file_name = :img_file_name,
             min_temp = :min_temp, 
-            max_temp = :max_temp, 
+            max_temp = :max_temp,
 
-            season_spring = :season_spring, 
+            season_spring = :season_spring,
             season_summer = :season_summer, 
             season_fall = :season_fall, 
-            season_winter = :season_winter, 
+            season_winter = :season_winter,
+            updated_at = NOW()
 
-            displayed = :displayed WHERE id = :id", $params);
-
-
+            WHERE id = :id", $params_1);
 
 
         //The variable "data" in the URL will be used inside the "start" function in the script.js file

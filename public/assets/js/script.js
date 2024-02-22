@@ -72,10 +72,14 @@ if (input_max_range) {
 }
 
 
+//Triigers input file in order to choose an image from the system
+if (document.querySelector('.btn-add-img')) {
+    document.querySelector('.btn-add-img').addEventListener('click', (e) => {
+        e.preventDefault();
+        layout.btn_choose_img();
+    })
 
-
-
-
+}
 
 
 
@@ -108,6 +112,7 @@ listItems.map(li => {
 
     })
 })
+
 
 //BTN ADD IMG
 if (document.querySelector('.btn-add')) {
@@ -263,11 +268,7 @@ if (document.querySelector('.btn-suggestion')) {
                     document.querySelector('#btn-launch-modal').click();
                 })
 
-        } else {
-            console.log('error');
         }
-
-
 
     })
 }
@@ -332,6 +333,7 @@ if (document.querySelector('.btn-remove')) {
 }
 
 
+
 /* BTN EDIT IMG*/
 if (document.querySelector('#btn-edit')) {
 
@@ -339,16 +341,42 @@ if (document.querySelector('#btn-edit')) {
 
         is_btn_edit_clicked = true;
 
-
         layout.btn_edit_clicked();
 
         //Fill input fields with current img's information
-        //Displays saved images
         axios.defaults.withCredentials = true;
-        axios.get('?a=retrieve_image_info&data=' + img_id)
-            .then(function (response) { })
+        axios.get('?a=show_img_info&data=' + img_id)
+            .then(function (response) {
+
+                let data = response.data[0]
+
+                if (data.length != 0) {
 
 
+                    //Fills input name with previously choosen name
+                    document.querySelector('#input-img-name').value = data.img_name
+
+
+                    //Fills input check (seasons) previously choosen ones
+                    if (data.season_spring != 0) {
+                        document.querySelector('.input-spring').checked = true
+                    }
+                    if (data.season_summer != 0) {
+                        document.querySelector('.input-summer').checked = true
+                    }
+                    if (data.season_fall != 0) {
+                        document.querySelector('.input-fall').checked = true
+                    }
+                    if (data.season_winter != 0) {
+                        document.querySelector('.input-winter').checked = true
+                    }
+
+                    //Fills input range ( temperature )
+                    input_max_range.value = data.max_temp
+                    input_min_range.value = data.min_temp
+                }
+
+            })
 
 
         // add id da imagem no "input file" do formulario
@@ -385,12 +413,10 @@ input_check_seasons.map(input_check => {
 
             } else if (e.target.id === "winter-check") {
                 is_winter_checked = true
-            } else if (e.target.id === 'all-seasons-check') {
-                is_all_seasons_checkd = true
-
             }
 
         } else {
+
             if (e.target.id === "spring-check") {
                 is_spring_checked = false
 
@@ -402,15 +428,8 @@ input_check_seasons.map(input_check => {
 
             } else if (e.target.id === "winter-check") {
                 is_winter_checked = false
-            } else if (e.target.id === 'all-seaons-check') {
-                is_all_seasons_checkd = false
-
             }
         }
-
-        //Hides warning text
-        alert_element.classList.remove('d-flex')
-        alert_element.classList.add('d-none')
     })
 })
 
@@ -419,12 +438,9 @@ if (document.querySelector('#btn-form-submit')) {
 
     document.querySelector('#btn-form-submit').addEventListener('click', (e) => {
 
-        if (!validate_form_input_checks()) {
-            e.preventDefault();
-        } else {
-            //Form will be submitted
-            document.querySelector('#btn-form-submit').textContent = "Saving..."
-        }
+        //Form will be submitted
+        document.querySelector('#btn-form-submit').textContent = "Saving..."
+
     })
 }
 
@@ -515,34 +531,12 @@ function start() {
     }
 
     update_displayed_images()
-     getWeather();
+    getWeather();
 
 } start();
 
 
 
-
-//Will be called on Forms btn "Save"
-function validate_form_input_checks() {
-
-
-    //Checks for all inputs empty
-    if (!is_spring_checked && !is_summer_checked && !is_fall_checked && !is_winter_checked && !is_all_seasons_checkd) {
-
-        //Shows warning alert
-        alert_text.innerHTML = "Choose at leat one season for this piece"
-        alert_element.classList.remove('d-none')
-        alert_element.classList.add('d-flex')
-
-        return false;
-    }
-
-
-    document.querySelector('#btn-form-submit').click();
-
-    return true;
-
-}
 
 
 
@@ -926,34 +920,28 @@ function show_image_info(img_id, body_part) {
 
 async function getWeather() {
 
+    if (is_user_logged()) {
+    
+        //Displays saved images
+        axios.defaults.withCredentials = true;
+        axios.get(`?a=weather_api`)
+            .then(function (response) {
 
-    //Displays saved images
-    axios.defaults.withCredentials = true;
-    axios.get(`?a=weather_api`)
-        .then(function (response) {
+                let data = response.data
 
-            let data = response.data
+                if (document.querySelector('#temperature-text')) {
 
-            if (document.querySelector('#temperature-text')) {
+                    document.querySelector('#temperature-text').textContent = data + '°C'
+                }
 
-                document.querySelector('#temperature-text').textContent = data + '°C'
-            }
-
-            current_temperature = data
+                current_temperature = data
 
 
-        }).catch(error => {
+            }).catch(error => {
 
-            console.log(error);
-            //Launches error alert
-            /*             Swal.fire({
-                            title: 'No internet connection at the moment',
-                            text: 'Make sure you have access to the internet',
-                            icon: 'warning',
-                        }) */
-
-            current_temperature = null
-        });
+                current_temperature = null
+            });
+    }
 }
 
 
@@ -962,7 +950,7 @@ async function is_user_logged() {
     axios.defaults.withCredentials = true;
     axios.get('?a=is_user_logged')
         .then(function (response) {
-
+       
             if (response.data === true) {
 
                 return true
@@ -1063,6 +1051,22 @@ function validatePassword(password1, password2) {
     // Additional password strength validations can be added here, such as requiring special characters, numbers, etc.
 
     // If all validations pass, return null (indicating no error)
+    return true;
+}
+
+function validatePasswordLogin(password) {
+    password = password.trim();
+
+
+    // Check password is empty
+    if (password === "") {
+        return "Password cannot be empty.";
+    }
+    // Check password strength 
+    if (password.length < 8) {
+        return "Password must be at least 8 characters long.";
+    }
+
     return true;
 }
 
@@ -1226,7 +1230,7 @@ async function load_cities_options() {
 //Btn Register
 if (document.querySelector('.btn-register')) {
     document.querySelector('.btn-register').addEventListener('click', (e) => {
-        console.log('clicked');
+     
 
         let input_name_register = document.querySelector('#signup-name').value
         let input_email_register = document.querySelector('#signup-email').value
@@ -1304,3 +1308,106 @@ if (document.querySelector('.btn-register')) {
 }
 
 
+
+
+//Btn Login
+if (document.querySelector('.btn-login')) {
+    document.querySelector('.btn-login').addEventListener('click', (e) => {
+
+        e.preventDefault();
+
+        // Get input values
+        var email = document.querySelector("#login-email").value.trim();
+        var password = document.querySelector("#login-password").value.trim();
+
+        let alertError = document.querySelector('.js-alert-error')
+
+
+        //Validade email login
+        if (!validateEmailLogin(email) || !validadePasswordLogin(password)) {
+            alertError.textContent = "invalid email or password"
+            alertError.classList.remove('d-none')
+
+
+        } else {
+            alertError.textContent = ""
+            alertError.classList.add('d-none')
+
+            document.querySelector('.login-form').submit();
+        }
+
+    })
+}
+
+function validateEmailLogin(email) {
+
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+
+}
+
+function validadePasswordLogin(password) {
+
+    if (password.length === 0) {
+        return false
+    } else {
+        return true
+    }
+}
+
+
+
+
+
+
+
+//Search input
+if (document.querySelector('.btn-search')) {
+
+
+    document.querySelector('.btn-search').addEventListener('click', (e) => {
+        e.preventDefault();
+        let searchText = document.querySelector(".input-search").value;
+
+        axios.defaults.withCredentials = true;
+        axios.get('?a=search_img_by_name&data=' + searchText)
+            .then(function (response) {
+
+            
+
+                let array_images = response.data;
+
+                //Deletes images shown inside gallery
+                //Refresh img container
+                while (img_container.firstChild) {
+                    img_container.removeChild(img_container.firstChild);
+                }
+                let img_type
+                array_images.map(image => {
+                    let img_id = image.id
+                    img_type = image.img_type
+                    let img_src = image.img_src
+                    let img_element = document.createElement('img')
+
+                    img_element.setAttribute('id', img_id)
+                    img_element.setAttribute('name', img_type)
+                    img_element.setAttribute('src', img_src)
+                    img_element.classList.add('img')
+                    img_container.appendChild(img_element)
+                })
+                //Adds images into the gallery based on the "search input"
+                const [...gallery_imgs] = document.querySelectorAll('.img')
+                gallery_imgs.map(img => {
+
+                    img.addEventListener('click', (e) => {
+
+
+                        show_image_info(e.target.id, img_type);
+                        img_id = e.target.id
+
+                    })
+                })
+            })
+    })
+
+}
