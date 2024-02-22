@@ -10,6 +10,7 @@ In this app you will be able to save the clothes you have along with their infor
 ![Badge](https://img.shields.io/badge/JavaScript-FFFF00)
 ![Badge](https://img.shields.io/badge/Axios-6E2BF2)
 ![Badge](https://img.shields.io/badge/Bootstrap-6E2BF2)
+![Badge](https://img.shields.io/badge/HTML-E34F26)
 
 ![efwwefwef](https://github.com/WelerM/build-look-mvc/assets/99507279/e97fe45a-ce00-4fee-9118-1979785c7c31)
 
