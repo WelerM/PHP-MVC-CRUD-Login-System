@@ -4,6 +4,7 @@ namespace core\models;
 
 use core\classes\Database;
 use core\classes\Functions;
+use Exception;
 
 class Users
 {
@@ -67,7 +68,7 @@ class Users
 
 
 
-        
+
         //Verify if email exists
         $results =  $db->select(
             "SELECT * FROM users 
@@ -103,8 +104,8 @@ class Users
 
         //Verify if passwords match
         if (!password_verify($user_password, $user->user_password)) {
-        
-            return "passwords don't match";
+
+            return "Invalid email or password";
         }
 
         //---------------------------------------------------
@@ -113,7 +114,7 @@ class Users
 
         return $user;
     }
-    
+
     //============================================================
 
     //Sign Up
@@ -146,11 +147,12 @@ class Users
             ':user_name' => trim($_POST['signup-name']),
             ':user_email' => strtolower(trim($_POST['signup-email'])),
             ':user_password' => password_hash(trim($_POST['signup-password']), PASSWORD_DEFAULT),
-            ':user_country' =>trim($_POST['select-country']),
-            ':user_state' =>trim($_POST['select-state']),
+            ':user_country' => trim($_POST['select-country']),
+            ':user_state' => trim($_POST['select-state']),
             ':user_city' => trim($_POST['select-city']),
             ':active' => 0,
             ':purl' => $purl
+
         ];
 
         $db->insert(
@@ -164,6 +166,7 @@ class Users
                 :user_city,
                 :active,
                 :purl,
+                NULL,
                 NOW(),
                 NOW(),
                 NULL
@@ -174,7 +177,73 @@ class Users
         return $purl;
     }
 
-    public static function retrieve_user_location($user_id){
+    //Recover password
+    public function check_email_exists($email)
+    {
+        $db = new Database();
+
+        $params = [
+            ':email' => strtolower(trim($email))
+        ];
+
+        $result = $db->select("
+        SELECT * FROM users WHERE user_email = :email", $params);
+
+        //Verifies on DB if a client with same the email exists
+        if (count($result) === 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function update_token($email, $token)
+    {
+        $db = new Database();
+
+        $params = [
+            ':email' =>  strtolower(trim($email)),
+            ':password_reset_token' => $token
+        ];
+
+        $db->update("
+        UPDATE users 
+        SET password_reset_token = :password_reset_token
+        WHERE user_email = :email", $params);
+    }
+    public function check_token_exists($token)
+    {
+        $db = new Database();
+
+        $params = [
+            ':password_reset_token' => $token
+        ];
+
+        $result = $db->select("
+        SELECT * FROM users
+        WHERE password_reset_token = :password_reset_token", $params);
+
+        return $result;
+    }
+
+    public function update_user_password($user_id, $passowrd)
+    {
+        $db = new Database();
+
+        $params = [
+            ':id' => $user_id,
+            ':user_password' => password_hash(trim($passowrd), PASSWORD_DEFAULT),
+        ];
+
+
+        $db->update("
+            UPDATE users
+            SET user_password = :user_password
+            WHERE id = :id", $params);
+    }
+
+    public static function retrieve_user_location($user_id)
+    {
         $db = new Database();
 
         $params = [

@@ -25,6 +25,10 @@ li:hover {
 
 
 }
+
+a{
+    text-decoration: none;
+}
 .btn-user{
     display: flex;
 }

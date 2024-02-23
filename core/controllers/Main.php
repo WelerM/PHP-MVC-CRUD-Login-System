@@ -81,6 +81,35 @@ class Main
             'layouts/html_footer',
         ]);
     }
+    public function reset_password_page()
+    {
+        if (!isset($_GET['token'])) {
+            $_SESSION['error'] = 'Invalid token';
+            Functions::redirect('send_recovery_email');
+            return;
+        }
+
+        $token = $_GET['token'];
+
+        Functions::Layout([
+            'layouts/html_header',
+            'layouts/header',
+            'reset_password',
+            'layouts/footer',
+            'layouts/html_footer',
+        ], $token);
+    }
+
+    public function send_recovery_email_page()
+    {
+        Functions::Layout([
+            'layouts/html_header',
+            'layouts/header',
+            'send_recovery_email',
+            'layouts/footer',
+            'layouts/html_footer',
+        ]);
+    }
     //===================================================================
 
 
@@ -145,34 +174,19 @@ class Main
 
         $result = $users->validate_login($user_email, $user_password);
 
-        if ($result === 'email doesnt exist') {
 
-            //Invalid login
-            $_SESSION['error'] = 'Invalid email or password';
+        if (is_string($result)) {
+            $_SESSION['error'] = $result;
             Functions::redirect('signin_page');
-            return;
-        } else if ($result === 'email not confirmed') {
-
-            $_SESSION['error'] = 'Email is not confirmed';
-            Functions::redirect('signin_page');
-            return;
-        } else  if ($result === "passwords don't match") {
-
-            $_SESSION['error'] = "passwords don't match";
-            Functions::redirect('signin_page');
-            return;
-        } else {
-
-            //Valid login
-            $_SESSION['user_id'] = $result->id;
-            $_SESSION['user_name'] = $result->user_name;
-            $_SESSION['user_email'] = $result->user_email;
-
-
-
-            Functions::redirect();
             return;
         }
+
+        //Valid login
+        $_SESSION['user_id'] = $result->id;
+        $_SESSION['user_name'] = $result->user_name;
+        $_SESSION['user_email'] = $result->user_email;
+
+        Functions::redirect('home');
     }
     //===================================================================
     public function signout()
@@ -310,7 +324,7 @@ class Main
             ]);
         } else {
 
-            $_SESSION['error'] = 'Couldt';
+            $_SESSION['error'] = "Error when confirming your email";
 
             Functions::Layout([
                 'layouts/html_header',
@@ -320,6 +334,103 @@ class Main
             ]);
         }
     }
+
+    public function send_recovery_email()
+    {
+        //Verifies if there was a form submition
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            Functions::redirect();
+            return;
+        }
+
+        if (!isset(($_POST['email'])) &&  trim($_POST['repeat-password']) === '') {
+            $_SESSION['error'] = 'Empty fields';
+            Functions::redirect('send_recovery_email');
+            return;
+        }
+
+        $email =  trim($_POST['email']);
+
+        //Check if email is valid
+
+
+
+        //Checks if user email exists on database
+        $users = new Users();
+        $email = new SendEmail();
+
+        if (!$users->check_email_exists($_POST['email'])) {
+
+            $_SESSION['error'] = "This email doesn't exist on database";
+            Functions::redirect('send_recovery_email_page');
+            return;
+        }
+
+
+        //If email exists, update user's column 'password_reset_token' with the
+        //nearly created token above
+        $token = bin2hex(random_bytes(32));
+
+        $users->update_token($_POST['email'], $token);
+
+
+        //Sends email to reset password
+        $email->send_email_reset_password($_POST['email'], $token);
+
+        Functions::redirect('email_sent_page');
+    }
+
+    public function reset_password()
+    {
+
+
+        $token = $_POST['token'];
+
+
+        if (!isset($_POST['password']) || !isset($_POST['repeat-password'])) {
+            $_SESSION['error'] = "Empty fields";
+
+            Functions::redirect("reset_password_page&token=$token");
+            return;
+        }
+        if (empty(trim($_POST['password'])) || empty(trim($_POST['repeat-password']))) {
+            $_SESSION['error'] = "Empty fields";
+
+            Functions::redirect("reset_password_page&token=$token");
+            return;
+        }
+
+        //Chek if  passwords match
+        if (trim($_POST['password']) != trim($_POST['repeat-password'])) {
+            $_SESSION['error'] = "Passwords don't match";
+
+            Functions::redirect("reset_password_page&token=$token");
+            return;
+        }
+
+
+        //asks  database if toek exists
+        $users = new Users();
+
+        $result = $users->check_token_exists($token);
+
+        if (count($result) === 0) {
+            $_SESSION['error'] = "Invalid token";
+
+            Functions::redirect("reset_password_page&token=$token");
+            return;
+        }
+
+        //If exists, get user id and update its password
+        $user_id =  $result[0]->id;
+
+        $users->update_user_password($user_id, $_POST['password']);
+
+        $_SESSION['success'] = "Your password was redefined!";
+        Functions::redirect('signin_page');
+    }
+
+
     //===================================================================
 
 
@@ -359,9 +470,10 @@ class Main
         }
     }
     //===================================================================
-    public function search_img_by_name(){
+    public function search_img_by_name()
+    {
         $name = $_GET['data'];
-  
+
         $db = new Database();
 
         $params = [
@@ -374,7 +486,9 @@ class Main
             "SELECT * FROM images 
              WHERE img_name 
              LIKE CONCAT('%', :img_name, '%') 
-             AND id_owner = :id_owner ", $params);
+             AND id_owner = :id_owner ",
+            $params
+        );
 
 
 
@@ -617,9 +731,6 @@ class Main
                     //The variable "data" in the URL will be used inside the "start" function in the script.js file
                     Functions::redirect("home&data=$data_type&error=none");
                     exit();
-
-
-
                 } else {
                     Functions::redirect("home&data=$data_type&error=filetoobig");
                     exit();

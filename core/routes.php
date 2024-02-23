@@ -9,6 +9,10 @@ $routes = [
     'signin_page' => 'main@signin_page',
     //Sign Up page
     'signup_page' => 'main@signup_page',
+    
+    'send_recovery_email_page' => 'main@send_recovery_email_page',
+    'reset_password_page'=> 'main@reset_password_page',
+
 
     //Sign In
     'signin' => 'main@signin',
@@ -16,6 +20,10 @@ $routes = [
     'signup' => 'main@signup',
     //Sign Out
     'signout' => 'main@signout',
+
+    'send_recovery_email' => 'main@send_recovery_email',
+
+    'reset_password'=> 'main@reset_password',
 
     //Email 
     'email_sent' => 'main@email_sent',
