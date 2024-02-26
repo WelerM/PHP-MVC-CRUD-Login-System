@@ -12,6 +12,8 @@ $routes = [
     
     'send_recovery_email_page' => 'main@send_recovery_email_page',
     'reset_password_page'=> 'main@reset_password_page',
+    
+    'account_page' => 'main@account_page',
 
 
     //Sign In

@@ -110,6 +110,32 @@ class Main
             'layouts/html_footer',
         ]);
     }
+
+    public function account_page()
+    {
+
+        //Verifies if there's an open session
+        if (!Functions::user_logged()) {
+            Functions::redirect();
+            return;
+        }
+
+
+
+        //Get user data
+        $user = new Users();
+
+
+        $data  = $user->get_user_personal_info($_SESSION['user_id']);
+
+        Functions::Layout([
+            'layouts/html_header',
+            'layouts/header',
+            'account_page',
+            'layouts/footer',
+            'layouts/html_footer',
+        ], $data);
+    }
     //===================================================================
 
 

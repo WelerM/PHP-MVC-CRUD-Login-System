@@ -242,6 +242,8 @@ class Users
             WHERE id = :id", $params);
     }
 
+
+
     public static function retrieve_user_location($user_id)
     {
         $db = new Database();
@@ -252,6 +254,19 @@ class Users
 
         $result = $db->select("
         SELECT user_country, user_state, user_city FROM users WHERE id = :user_id", $params);
+
+        return $result;
+    }
+
+    public static function get_user_personal_info($user_id)
+    {
+        $db = new Database();
+
+        $params = [
+            ':id' => $user_id
+        ];
+
+        $result =  $db->select("SELECT * FROM users WHERE id = :id", $params);
 
         return $result;
     }

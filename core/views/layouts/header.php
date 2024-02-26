@@ -55,7 +55,7 @@ use core\classes\Functions;
                 <ul class="custom-ul flex-column mb-2 mb-lg-0 border-0  me-3">
 
                     <li class="nav-item">
-                        <a class="nav-link " href="?a=signin_page">Account</a>
+                        <a class="nav-link " href="?a=account_page">Account</a>
                     </li>
 
                     <li class="nav-item">
